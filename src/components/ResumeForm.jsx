@@ -124,7 +124,7 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
       softSkills,
     };
     setFormData(resumeData);
-    dynamicNavigation("/digital-resume");
+    dynamicNavigation("/digital-resume/1");
   };
   useEffect(() => {
     setFormData({

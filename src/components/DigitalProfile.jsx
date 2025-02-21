@@ -1,8 +1,10 @@
-import React, { useRef, useState} from "react";
+import React, { useRef, useState } from "react";
 import { Box, Typography, Grid, Divider, Button, Avatar } from "@mui/material";
 import html2pdf from "html2pdf.js";
+import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
-const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
+import { Phone, Email, Work } from "@mui/icons-material";
+const DigitalProfile3 = ({ formData, dynamicNavigation, handleSubmit }) => {
   const {
     name,
     email,
@@ -20,134 +22,117 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
   } = formData;
   const resumeRef = useRef();
   const [image, setImage] = useState("/static/images/avatar/1.jpg");
+  //   const handleDownload = () => {
+  //     const element = resumeRef.current;
+
+  //     // Define options for the PDF
+  //     const doc = new jsPDF();
+
+  //   // Get the resume container element
+  //   //const element = resumeRef.current;
+
+  //   // Use the html() method of jsPDF to directly render the HTML
+  //   doc.html(element, {
+  //     callback: function (doc) {
+  //       // Save the PDF after the content is added
+  //       doc.save("Resume.pdf");
+  //     },
+  //     margin: [10, 10, 10, 10], // Adjust margin if necessary
+  //     x: 10, // Horizontal margin
+  //     y: 10, // Vertical margin
+  //     width: 180, // Max width of the content on the page
+  //   });
+  //     // Navigate to the thank you page after the download starts
+  //     dynamicNavigation("/thank-you");
+  //   };
   const handleDownload = async () => {
-      const pdf = new jsPDF("p", "pt", "a4"); // 'pt' for point units, 'a4' for standard page size
-      const element = resumeRef.current;
-  
-      pdf.html(element, {
-        callback: function (doc) {
-          doc.save("Resume.pdf");
-        },
-        x: 0, // Left padding
-        y: 0, // Top padding
-        html2canvas: {
-          scale: 0.675, // Adjust the scale for better quality without excessive zoom
-          letterRendering: true, 
-          logging: false,
-          useCORS: true, // Ensure images (if any) are loaded correctly
-        },
-        
-        margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
-        autoPaging: true, // Ensures multi-page support
-      });
-    };
+    const pdf = new jsPDF("p", "pt", "a4"); // 'pt' for point units, 'a4' for standard page size
+    const element = resumeRef.current;
 
-  const handleAvatarClick = () => {
-    document.getElementById("avatar-upload").click(); // ✅ Triggers file input click
+    pdf.html(element, {
+      callback: function (doc) {
+        doc.save("Resume.pdf");
+      },
+      x: 0, // Left padding
+      y: 0, // Top padding
+      html2canvas: {
+        scale: 0.675, // Adjust the scale for better quality without excessive zoom
+      },
+      margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
+      autoPaging: true, // Ensures multi-page support
+    });
   };
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl); // ✅ Updates Avatar with new image
-    }
-  };
   return (
     <>
       <Box
         ref={resumeRef}
+        id="resume-container"
         sx={{
-          padding: "20px 40px",
+          padding: "10px 40px",
           maxWidth: "800px",
           margin: "auto",
-          backgroundColor: "#fdfdfd",
+          //backgroundColor: "#fdfdfd",
           borderRadius: "10px",
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
         {/* Header Section */}
-        <Box
-          sx={{
-            display: "flex",
-            marginBottom: "10px",
-            backgroundColor: "aliceblue",
-            position: "relative",
-          }}
-        >
-          <Box sx={{ margin: "10px 20px", zIndex: 1 }}>
-            <Avatar
-              alt="User Avatar"
-              src={image} // ✅ Uses state to update image
-              sx={{ width: 114, height: 114, cursor: "pointer" }} // ✅ Ensures it's clickable
-              onClick={handleAvatarClick}
-            />
-            <input
-              type="file"
-              id="avatar-upload"
-              style={{ display: "none" }}
-              accept="image/*"
-              onChange={handleImageChange}
-            />
-          </Box>
+        <Box>
           <Box
             sx={{
               textAlign: "center",
-              position: "absolute",
-              width: "100%",
             }}
           >
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: "bold", color: "#3f51b5" }}
-            >
+            <Typography variant="h3" fontWeight="bold">
               {name || "Your Name"}
             </Typography>
-            <Typography variant="h6" sx={{ color: "#757575" }}>
+            <Typography variant="h5" color="textSecondary">
               {role || "Your Role"}
             </Typography>
-            <Typography variant="body2" sx={{ color: "#757575" }}>
-              Phone: {number || "Your Phone"} | Email: {email || "Your Email"}
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#757575" }}>
-              WorkID's: {workIds?.join(" ,") || "Your WorkID's"}
+            <Typography variant="body1">
+              {number || "Your Phone"}
+              {" | "}
+
+              {email || "Your Email"}
+              {" | "}
+
+              {workIds?.join(", ") || "Your WorkID's"}
             </Typography>
           </Box>
         </Box>
 
-        <Divider
-          sx={{
-            marginBottom: "10px",
-            height: "2px",
-            backgroundColor: "#3f51b5",
-          }}
-        />
+        <Divider aria-label="Section Divider" />
 
         {/* Profile Summary */}
-        <Box sx={{ marginBottom: "10px" }}>
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: "bold", color: "#3f51b5", marginBottom: "10px" }}
-          >
+        <Box>
+          <Typography variant="h6" fontWeight="bold" color="textPrimary">
             Professional Summary
           </Typography>
           {summary ? (
             summary.split("\n").map((value, index) => (
               <Typography
                 key={index}
-                variant="body2"
+                variant="body1"
                 sx={{
-                  color: "#424242",
                   breakInside: "avoid", // Prevents breaking within this line
                   pageBreakInside: "avoid",
                   whiteSpace: "pre-wrap",
                 }}
               >
-                {value}
+                {value
+                    .split(/(#.*?#)/)
+                    .map((part, i) =>
+                      part.startsWith("#") && part.endsWith("#") ? (
+                        <strong key={i}>{part.replace(/#/g, "")}</strong>
+                      ) : (
+                        part
+                      )
+                    )}
               </Typography>
             ))
           ) : (
-            <Typography variant="body2" sx={{ color: "#424242" }}>
+            <Typography variant="body1">
               Write a compelling profile summary about yourself. Highlight your
               skills, achievements, and professional background in a crisp
               manner.
@@ -155,125 +140,15 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
           )}
         </Box>
 
-        <Divider
-          sx={{
-            marginBottom: "10px",
-            height: "2px",
-            backgroundColor: "#3f51b5",
-          }}
-        />
+        <Divider />
 
-        {/* Skills Section */}
-        <Box sx={{ marginBottom: "10px" }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: "bold",
-              color: "#3f51b5",
-              marginBottom: "10px",
-              breakInside: "avoid", // Prevents breaking within this line
-              pageBreakInside: "avoid",
-            }}
-          >
-            Skill Set
-          </Typography>
-          <Grid container spacing={2}>
-            {skills && skills.length > 0 ? (
-              skills.map((skill, index) => (
-                <Grid item xs={4} key={index}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "#424242",
-                      breakInside: "avoid", // Prevents breaking within this line
-                      pageBreakInside: "avoid",
-                      whiteSpace: "pre-wrap",
-                    }}
-                  >
-                    {skill}
-                  </Typography>
-                </Grid>
-              ))
-            ) : (
-              <Grid item xs={12}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "#424242",
-                    breakInside: "avoid", // Prevents breaking within this line
-                    pageBreakInside: "avoid",
-                  }}
-                >
-                  Add your skills to showcase your expertise
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-        </Box>
-
-        <Divider
-          sx={{
-            marginBottom: "10px",
-            height: "2px",
-            backgroundColor: "#3f51b5",
-          }}
-        />
-
-        <Box sx={{ marginBottom: "10px" }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: "bold",
-              color: "#3f51b5",
-              marginBottom: "10px",
-              breakInside: "avoid", // Prevents breaking within this line
-              pageBreakInside: "avoid",
-            }}
-          >
-            Soft Skills
-          </Typography>
-          <Grid container spacing={2}>
-            {softSkills && softSkills.length > 0 ? (
-              softSkills.map((softSkill, index) => (
-                <Grid item xs={4} key={index}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "#424242",
-                      breakInside: "avoid", // Prevents breaking within this line
-                      pageBreakInside: "avoid",
-                      whiteSpace: "pre-wrap",
-                    }}
-                  >
-                    {softSkill}
-                  </Typography>
-                </Grid>
-              ))
-            ) : (
-              <Grid item xs={12}>
-                <Typography variant="body2" sx={{ color: "#424242" }}>
-                  Add your soft skills to showcase your expertise
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-        </Box>
-
-        <Divider
-          sx={{
-            marginBottom: "10px",
-            height: "2px",
-            backgroundColor: "#3f51b5",
-          }}
-        />
         {/* Experience Section */}
 
         <Typography
-          variant="h5"
+          variant="h6"
+          fontWeight="bold"
+          color="textPrimary"
           sx={{
-            fontWeight: "bold",
-            color: "#3f51b5",
-            marginBottom: "10px",
             breakInside: "avoid", // Prevents breaking within this line
             pageBreakInside: "avoid",
           }}
@@ -282,12 +157,12 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
         </Typography>
         {experience && experience.length > 0 ? (
           experience.map((exp, index) => (
-            <Box key={index} sx={{ marginBottom: "20px" }}>
+            <Box key={index}>
               <Typography
                 variant="h6"
+                fontWeight="bold"
+                color="textPrimary"
                 sx={{
-                  fontWeight: "bold",
-                  color: "#424242",
                   breakInside: "avoid", // Prevents breaking within this line
                   pageBreakInside: "avoid",
                   whiteSpace: "pre-wrap",
@@ -297,11 +172,9 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
                 {exp.location || "Location"})
               </Typography>
               <Typography
-                variant="body2"
+                variant="body1"
                 sx={{
                   fontStyle: "italic",
-                  color: "#757575",
-                  marginBottom: "10px",
                   breakInside: "avoid", // Prevents breaking within this line
                   pageBreakInside: "avoid",
                 }}
@@ -312,27 +185,29 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
 
               {/* Display responsibilities with individual line protection */}
               {exp.responsibilities ? (
-                <Box>
-                  {exp.responsibilities.split("\n").map((responsibility, i) => {
-                    const isHeading = responsibility.startsWith("#");
-                    return (
-                      <Typography
-                        key={i}
-                        variant={isHeading ? "h6" : "body2"}
-                        sx={{
-                          display: "block",
-                          breakInside: "avoid", // Prevents breaking within this line
-                          pageBreakInside: "avoid",
-                          whiteSpace: "pre-wrap",
-                        }}
-                      >
-                        {isHeading ? responsibility.replace("#", "") : responsibility}
-                      </Typography>
-                    );
-                  })}
-                </Box>
+                exp.responsibilities.split("\n").map((line, index) => (
+                  <Typography
+                    key={index}
+                    variant="body1"
+                    sx={{
+                      whiteSpace: "pre-wrap",
+                      breakInside: "avoid",
+                      pageBreakInside: "avoid",
+                    }}
+                  >
+                    {line
+                      .split(/(#.*?#)/)
+                      .map((part, i) =>
+                        part.startsWith("#") && part.endsWith("#") ? (
+                          <strong key={i}>{part.replace(/#/g, "")}</strong>
+                        ) : (
+                          part
+                        )
+                      )}
+                  </Typography>
+                ))
               ) : (
-                <Typography variant="body2" sx={{ color: "#424242" }}>
+                <Typography variant="body1">
                   Mention your responsibilities, achievements, and contributions
                   in this role.
                 </Typography>
@@ -340,115 +215,21 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
             </Box>
           ))
         ) : (
-          <Typography variant="body2" sx={{ color: "#424242" }}>
+          <Typography variant="body1">
             Add your work experience to showcase your professional journey.
           </Typography>
         )}
 
-        <Divider
-          sx={{
-            marginTop: "30px",
-            marginBottom: "10px",
-            height: "2px",
-            backgroundColor: "#3f51b5",
-          }}
-        />
-        {/* Education Section */}
-        <Box sx={{ marginBottom: "10px" }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: "bold",
-              color: "#3f51b5",
-              marginBottom: "10px",
-              breakInside: "avoid", // Prevents breaking within this line
-              pageBreakInside: "avoid",
-            }}
-          >
-            Education Details
-          </Typography>
-          {educationDetails ? (
-            educationDetails.split("\n").map((value, index) => (
-              <Typography
-                key={index}
-                variant="body2"
-                sx={{
-                  color: "#424242",
-                  whiteSpace: "pre-wrap",
-                  breakInside: "avoid", // Prevents breaking within this line
-                  pageBreakInside: "avoid",
-                }}
-              >
-                {value}
-              </Typography>
-            ))
-          ) : (
-            <Typography variant="body2" sx={{ color: "#424242" }}>
-              Mention your educational qualifications in a crisp manner.
-            </Typography>
-          )}
-        </Box>
+        <Divider />
 
-        <Divider
-          sx={{
-            marginBottom: "10px",
-            height: "2px",
-            backgroundColor: "#3f51b5",
-          }}
-        />
-        {/* certification Section */}
-        <Box sx={{ marginBottom: "10px" }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: "bold",
-              color: "#3f51b5",
-              marginBottom: "10px",
-              breakInside: "avoid", // Prevents breaking within this line
-              pageBreakInside: "avoid",
-            }}
-          >
-            Certifications
-          </Typography>
-          {certification ? (
-            certification.split("\n").map((value, index) => (
-              <Typography
-                key={index}
-                variant="body2"
-                sx={{
-                  color: "#424242",
-                  whiteSpace: "pre-wrap",
-                  breakInside: "avoid", // Prevents breaking within this line
-                  pageBreakInside: "avoid",
-                }}
-              >
-                {value}
-              </Typography>
-            ))
-          ) : (
-            <Typography variant="body2" sx={{ color: "#424242" }}>
-              Mention your certificates with the name of the certification and
-              the year of completion.
-            </Typography>
-          )}
-        </Box>
-
-        <Divider
-          sx={{
-            marginBottom: "10px",
-            height: "2px",
-            backgroundColor: "#3f51b5",
-          }}
-        />
         {/* IT Skills */}
 
-        <Box sx={{ marginBottom: "10px" }}>
+        <Box>
           <Typography
-            variant="h5"
+            variant="h6"
+            fontWeight="bold"
+            color="textPrimary"
             sx={{
-              fontWeight: "bold",
-              color: "#3f51b5",
-              marginBottom: "10px",
               breakInside: "avoid", // Prevents breaking within this line
               pageBreakInside: "avoid",
             }}
@@ -456,71 +237,159 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
             IT Skills
           </Typography>
           {itSkills ? (
-            itSkills.split("\n").map((value, index) => (
+            itSkills.split("\n").map((line, index) => (
               <Typography
                 key={index}
-                variant="body2"
+                variant="body1"
                 sx={{
-                  color: "#424242",
                   whiteSpace: "pre-wrap",
-                  breakInside: "avoid", // Prevents breaking within this line
+                  breakInside: "avoid",
                   pageBreakInside: "avoid",
                 }}
               >
-                {value}
+                {line
+                  .split(/(#.*?#)/)
+                  .map((part, i) =>
+                    part.startsWith("#") && part.endsWith("#") ? (
+                      <strong key={i}>{part.replace(/#/g, "")}</strong>
+                    ) : (
+                      part
+                    )
+                  )}
               </Typography>
             ))
           ) : (
-            <Typography variant="body2" sx={{ color: "#424242" }}>
-              Mention your IT skills like programming languages,technologies,
+            <Typography variant="body1">
+              Mention your IT skills like programming languages, technologies,
               tools, etc.
             </Typography>
           )}
         </Box>
 
-        <Divider
-          sx={{
-            marginBottom: "10px",
-            height: "2px",
-            backgroundColor: "#3f51b5",
-          }}
-        />
-        {/* Personal Details */}
-        <Box sx={{ marginBottom: "10px" }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: "bold",
-              color: "#3f51b5",
-              marginBottom: "10px",
-              breakInside: "avoid", // Prevents breaking within this line
-              pageBreakInside: "avoid",
-            }}
-          >
-            Personal Details
-          </Typography>
-          {personalDetails ? (
-            personalDetails.split("\n").map((value, index) => (
+        <Divider />
+        {/* certification Section */}
+        {certification && (
+          <>
+            <Box>
               <Typography
-                key={index}
-                variant="body2"
+                variant="h6"
+                fontWeight="bold"
+                color="textPrimary"
                 sx={{
-                  color: "#424242",
-                  whiteSpace: "pre-wrap",
                   breakInside: "avoid", // Prevents breaking within this line
                   pageBreakInside: "avoid",
                 }}
               >
-                {value}
+                Certifications
+              </Typography>
+              {certification.split("\n").map((line, index) => (
+                <Typography
+                  key={index}
+                  variant="body1"
+                  sx={{
+                    whiteSpace: "pre-wrap",
+                    breakInside: "avoid",
+                    pageBreakInside: "avoid",
+                  }}
+                >
+                  {line
+                    .split(/(#.*?#)/)
+                    .map((part, i) =>
+                      part.startsWith("#") && part.endsWith("#") ? (
+                        <strong key={i}>{part.replace(/#/g, "")}</strong>
+                      ) : (
+                        part
+                      )
+                    )}
+                </Typography>
+              ))}
+            </Box>
+          </>
+        )}
+
+        <Divider />
+        {/* Education Section */}
+        <Box>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            color="textPrimary"
+            sx={{
+              breakInside: "!avoid", // Prevents breaking within this line
+              pageBreakInside: "!avoid",
+            }}
+          >
+            Education Details
+          </Typography>
+          {educationDetails ? (
+            educationDetails.split("\n").map((line, index) => (
+              <Typography
+                key={index}
+                variant="body1"
+                sx={{
+                  whiteSpace: "pre-wrap",
+                  breakInside: "avoid",
+                  pageBreakInside: "avoid",
+                }}
+              >
+                {line
+                  .split(/(#.*?#)/)
+                  .map((part, i) =>
+                    part.startsWith("#") && part.endsWith("#") ? (
+                      <strong key={i}>{part.replace(/#/g, "")}</strong>
+                    ) : (
+                      part
+                    )
+                  )}
               </Typography>
             ))
           ) : (
-            <Typography variant="body2" sx={{ color: "#424242" }}>
-              Mention your personal details like Date of Birth, Address,
-              languages known, etc.
+            <Typography variant="body1">
+              Mention your educational qualifications in a crisp manner.
             </Typography>
           )}
         </Box>
+
+        {/* Personal Details */}
+        {personalDetails && (
+          <>
+            <Divider />
+            <Box>
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                color="textPrimary"
+                sx={{
+                  breakInside: "avoid", // Prevents breaking within this line
+                  pageBreakInside: "avoid",
+                }}
+              >
+                Personal Details
+              </Typography>
+              {personalDetails.split("\n").map((line, index) => (
+                <Typography
+                  key={index}
+                  variant="body1"
+                  sx={{
+                    whiteSpace: "pre-wrap",
+                    breakInside: "avoid",
+                    pageBreakInside: "avoid",
+                  }}
+                >
+                  {line
+                    .split(/(#.*?#)/)
+                    .map((part, i) =>
+                      part.startsWith("#") && part.endsWith("#") ? (
+                        <strong key={i}>{part.replace(/#/g, "")}</strong>
+                      ) : (
+                        part
+                      )
+                    )}
+                </Typography>
+              ))}
+            </Box>
+          </>
+        )}
       </Box>
       {/* Buttons */}
       <Box
@@ -536,7 +405,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
         <Button
           variant="outlined"
           color="primary"
-          onClick={() => dynamicNavigation(-1)}
+          onClick={() => dynamicNavigation('/form')}
           sx={{
             borderRadius: "8px",
             padding: "10px 20px",
@@ -562,4 +431,4 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
   );
 };
 
-export default DigitalProfile;
+export default DigitalProfile3;
