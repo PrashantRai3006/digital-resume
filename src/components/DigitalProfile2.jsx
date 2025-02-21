@@ -128,12 +128,12 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                       {exp.responsibilities
                         .split("\n")
                         .map((responsibility, i) => {
-                          const isHeading = responsibility.startsWith("#");
+                          
                           return (
                             <Typography
                               key={i}
                               color="textPrimary"
-                              variant={isHeading ? "h6" : "body1"}
+                              variant= "body1"
                               sx={{
                                 display: "block",
                                 breakInside: "avoid", // Prevents breaking within this line
@@ -141,9 +141,15 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                                 whiteSpace: "pre-wrap",
                               }}
                             >
-                              {isHeading
-                                ? responsibility.replace("#", "")
-                                : responsibility}
+                              {responsibility
+                    .split(/(#.*?#)/)
+                    .map((part, i) =>
+                      part.startsWith("#") && part.endsWith("#") ? (
+                        <strong key={i}>{part.replace(/#/g, "")}</strong>
+                      ) : (
+                        part
+                      )
+                    )}
                             </Typography>
                           );
                         })}
@@ -183,7 +189,15 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                       pageBreakInside: "avoid",
                     }}
                   >
-                    {value}
+                    {value
+                    .split(/(#.*?#)/)
+                    .map((part, i) =>
+                      part.startsWith("#") && part.endsWith("#") ? (
+                        <strong key={i}>{part.replace(/#/g, "")}</strong>
+                      ) : (
+                        part
+                      )
+                    )}
                   </Typography>
                 ))
               ) : (
@@ -253,7 +267,15 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                               whiteSpace: "pre-wrap",
                             }}
                           >
-                            {skill}
+                            {skill
+                    .split(/(#.*?#)/)
+                    .map((part, i) =>
+                      part.startsWith("#") && part.endsWith("#") ? (
+                        <strong key={i}>{part.replace(/#/g, "")}</strong>
+                      ) : (
+                        part
+                      )
+                    )}
                           </Typography>
                         </ListItem>
                       ))}
@@ -343,7 +365,15 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                               whiteSpace: "pre-wrap",
                             }}
                           >
-                            {certificate}
+                            {certificate
+                    .split(/(#.*?#)/)
+                    .map((part, i) =>
+                      part.startsWith("#") && part.endsWith("#") ? (
+                        <strong key={i}>{part.replace(/#/g, "")}</strong>
+                      ) : (
+                        part
+                      )
+                    )}
                           </Typography>
                         </ListItem>
                       ))}
@@ -411,7 +441,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => dynamicNavigation(-1)}
+          onClick={() => dynamicNavigation('/form')}
           sx={{
             borderRadius: "8px",
             padding: "10px 20px",
