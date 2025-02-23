@@ -20,7 +20,7 @@ const LoginPage = ({ dynamicNavigation }) => {
       }
       dynamicNavigation("/form");
     } catch (err) {
-      setError(err.message);
+      setError(err.message.slice(err.message.indexOf("Error")));
     }
   };
 
