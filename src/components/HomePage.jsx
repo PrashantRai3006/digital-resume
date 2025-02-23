@@ -1,7 +1,17 @@
-import React from "react";
+import React ,{useEffect,useState}from "react";
 import { Box, Typography, Button } from "@mui/material";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 const HomePage = ({ dynamicNavigation }) => {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      
+    });
+    return () => unsubscribe();
+  }, []);
   return (
     <Box
       sx={{
@@ -26,7 +36,7 @@ const HomePage = ({ dynamicNavigation }) => {
         variant="contained"
         color="secondary"
         size="large"
-        onClick={()=>dynamicNavigation("/form")}
+        onClick={()=>dynamicNavigation(user?'/form':"/login")}
         sx={{ borderRadius: "20px", padding: "10px 30px" }}
       >
         Get Started

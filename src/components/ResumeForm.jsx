@@ -14,6 +14,9 @@ import { DeleteForever } from "@mui/icons-material";
 import dayjs from "dayjs"; // Ensure you have dayjs installed
 import { use } from "react";
 import { useEffect } from "react";
+import { signOut } from "firebase/auth";
+import { auth } from "./firebase"; // Ensure correct import path
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
   const [skills, setSkills] = useState(formData.skills || []);
@@ -28,6 +31,7 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
   const [workIds, setWorkIds] = useState(formData.workIds || []);
   const [softSkills, setSoftSkills] = useState(formData.softSkills || []);
   const [newSoftSkill, setNewSoftSkill] = useState("");
+  
   const [educationDetails, setEducationDetails] = useState(
     formData.educationDetails || ""
   );
@@ -38,6 +42,19 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
   const [personalDetails, setPersonalDetails] = useState(
     formData.personalDetails || ""
   );
+  
+
+const handleLogout = async () => {
+  try {
+    await signOut(auth);
+    console.log("User logged out successfully!");
+    // Redirect user to login page after logout
+    window.location.href = "/login"; 
+  } catch (error) {
+    console.error("Error logging out:", error);
+  }
+};
+
 
   const handleAddSkill = () => {
     if (newSkill.trim() !== "") {
@@ -142,7 +159,24 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
       role,
       softSkills,
     });
-  },[skills,experience,summary,workId,name,number,email,role,newSkill,workIds,softSkills,educationDetails,certification,itSkills,personalDetails,setFormData])
+  }, [
+    skills,
+    experience,
+    summary,
+    workId,
+    name,
+    number,
+    email,
+    role,
+    newSkill,
+    workIds,
+    softSkills,
+    educationDetails,
+    certification,
+    itSkills,
+    personalDetails,
+    setFormData,
+  ]);
 
   return (
     <Box
@@ -156,17 +190,48 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
         backdropFilter: "blur(10px)",
       }}
     >
-      <Typography
-        variant="h4"
-        sx={{
-          marginBottom: "30px",
-          textAlign: "center",
-          color: "#3f51b5",
-          fontWeight: "bold",
-        }}
-      >
-        Create Your Professional Resume
-      </Typography>
+      <Box
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "20px 0px",
+    position: "relative",
+  }}
+>
+  <Typography
+    variant="h4"
+    sx={{
+      textAlign: "center",
+      color: "#3f51b5",
+      fontWeight: "bold",
+      position: "absolute",
+      left: "50%",
+      transform: "translateX(-50%)",
+    }}
+  >
+    Create Your Professional Resume
+  </Typography>
+  <Button
+    variant="contained"
+    color="error"
+    onClick={handleLogout}
+    startIcon={<LogoutIcon />}
+    sx={{
+      borderRadius: "8px",
+      padding: "10px 24px",
+      fontWeight: "bold",
+      backgroundColor: "#d32f2f",
+      '&:hover': { backgroundColor: "#b71c1c" },
+      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+      marginLeft: "auto",
+    }}
+  >
+    Log Out
+  </Button>
+</Box>
+
+
 
       {/* Basic Information */}
       <Grid container spacing={2}>
