@@ -40,6 +40,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
         margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
         autoPaging: true, // Ensures multi-page support
       });
+      dynamicNavigation("/thank-you");
     };
 
   const handleAvatarClick = () => {
