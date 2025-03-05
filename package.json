@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cashfreepayments/cashfree-js": "^1.0.5",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.1",
@@ -10,6 +11,8 @@
     "@mui/x-date-pickers": "^7.24.0",
     "@shadcn/ui": "^0.0.4",
     "axios": "^1.7.9",
+    "cashfree": "^1.0.1",
+    "cashfree-sdk": "^0.1.1",
     "cra-template": "1.2.0",
     "dayjs": "^1.11.13",
     "firebase": "^11.3.1",

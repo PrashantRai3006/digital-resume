@@ -141,7 +141,7 @@ const handleLogout = async () => {
       softSkills,
     };
     setFormData(resumeData);
-    dynamicNavigation("/digital-resume/1");
+    dynamicNavigation("/resume-preview");
   };
   useEffect(() => {
     setFormData({
