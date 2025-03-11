@@ -74,7 +74,7 @@ const CashfreePayment = () => {
       const orderID = `ORDER_${Date.now()}`;
       setOrderId(orderID);
 
-      const response = await fetch("http://localhost:5001/create-order", {
+      const response = await fetch(`${process.env.REACT_APP_PAYMENT_URL}/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -127,7 +127,7 @@ const CashfreePayment = () => {
 
     while (attempts < maxAttempts) {
       try {
-        const response = await fetch(`http://localhost:5001/verify-payment/${orderID}`);
+        const response = await fetch(`${process.env.REACT_APP_PAYMENT_URL}/verify-payment/${orderID}`);
         if (!response.ok) {
           throw new Error(`❌ Server Error: ${response.status}`);
         }

@@ -2,6 +2,7 @@ import React, { useRef, useState} from "react";
 import { Box, Typography, Grid, Divider, Button, Avatar } from "@mui/material";
 import html2pdf from "html2pdf.js";
 import { jsPDF } from "jspdf";
+import EducationDetails from "../FormComponents/EducationDetails";
 const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
   const {
     name,
@@ -21,27 +22,87 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
   const resumeRef = useRef();
   const [image, setImage] = useState("/static/images/avatar/1.jpg");
   const handleDownload = async () => {
-      const pdf = new jsPDF("p", "pt", "a4"); // 'pt' for point units, 'a4' for standard page size
-      const element = resumeRef.current;
-  
-      pdf.html(element, {
-        callback: function (doc) {
-          doc.save("Resume.pdf");
-        },
-        x: 0, // Left padding
-        y: 0, // Top padding
-        html2canvas: {
-          scale: 0.675, // Adjust the scale for better quality without excessive zoom
-          letterRendering: true, 
-          logging: false,
-          useCORS: true, // Ensure images (if any) are loaded correctly
-        },
-        
-        margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
-        autoPaging: true, // Ensures multi-page support
-      });
-      dynamicNavigation("/thank-you");
-    };
+        const pdf = new jsPDF("p", "px", "a4");
+    
+        const element = resumeRef.current;
+        if (!element) return;
+    
+        // Hide links temporarily
+        element.querySelectorAll("a").forEach((link) => {
+          link.style.visibility = "hidden";
+        });
+    
+        // Capture element size dynamically
+        const originalWidth = element.scrollWidth;
+        const originalHeight = element.scrollHeight;
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const scaleFactor = pageWidth / originalWidth;
+    
+        await pdf.html(element, {
+          callback: function (doc) {
+            setTimeout(() => {
+              const links = element.querySelectorAll("a");
+              const parentRect = element.getBoundingClientRect();
+              links.forEach((link) => {
+                const text = link.textContent || "";
+                const href = link.href;
+                const rect = link.getBoundingClientRect();
+    
+                let x = (rect.left - parentRect.left) * scaleFactor;
+                let y = (rect.top - parentRect.top) * scaleFactor + 28.5;
+    
+                // 🔹 Fix multi-page positioning
+                let pageNumber = Math.floor(y / pageHeight) + 1;
+    
+                // ✅ Force links onto the first page if y is within range
+                if (y < pageHeight) {
+                  pageNumber = 1;
+                }
+    
+                let adjustedY = y % pageHeight; // Reset y per page
+    
+                if (pageNumber > 1) {
+                  while (doc.internal.pages.length < pageNumber) {
+                    doc.addPage();
+                  }
+                  doc.setPage(pageNumber);
+                } else {
+                  doc.setPage(1);
+                }
+    
+                console.log(
+                  `Adding Link: ${text} on Page ${pageNumber} at (${x}, ${adjustedY})`
+                );
+                doc.setFont("Helvetica", "normal");
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 255);
+                doc.textWithLink(text, x, adjustedY, { url: href });
+              });
+    
+              doc.save("Resume.pdf");
+            }, 500);
+          },
+    
+          html2canvas: {
+            scale: scaleFactor, // Fixes zoom issue
+            useCORS: true,
+            logging: false,
+            dpi: 96,
+            width: originalWidth,
+            height: originalHeight,
+          },
+          margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
+        autoPaging: true, 
+        });
+    
+        // Restore links after rendering
+        setTimeout(() => {
+          element.querySelectorAll("a").forEach((link) => {
+            link.style.visibility = "visible";
+          });
+        }, 1000);
+      };
 
   const handleAvatarClick = () => {
     document.getElementById("avatar-upload").click(); // ✅ Triggers file input click
@@ -59,7 +120,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
       <Box
         ref={resumeRef}
         sx={{
-          padding: "20px 40px",
+          padding: "10px 40px",
           maxWidth: "800px",
           margin: "auto",
           backgroundColor: "#fdfdfd",
@@ -108,10 +169,30 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
               {role || "Your Role"}
             </Typography>
             <Typography variant="body2" sx={{ color: "#757575" }}>
-              Phone: {number || "Your Phone"} | Email: {email || "Your Email"}
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#757575" }}>
-              WorkID's: {workIds?.join(" ,") || "Your WorkID's"}
+              Phone: {number || "Your Phone"} | Email: {email || "Your Email"} | Work Id's:
+            
+            {Boolean(workIds.length) ? (
+  
+    
+  workIds.map((work, index) => (
+    <a
+      key={index}
+      href={work.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        marginRight:'5px'
+       
+      }}
+    >
+      {work.label || "Untitled"}
+    </a>
+  ))
+
+
+) : (
+"Add your work Id's to showcase your expertise"
+)}
             </Typography>
           </Box>
         </Box>
@@ -127,7 +208,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
         {/* Profile Summary */}
         <Box sx={{ marginBottom: "10px" }}>
           <Typography
-            variant="h5"
+            variant="h6"
             sx={{ fontWeight: "bold", color: "#3f51b5", marginBottom: "10px" }}
           >
             Professional Summary
@@ -175,7 +256,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
         {/* Skills Section */}
         <Box sx={{ marginBottom: "10px" }}>
           <Typography
-            variant="h5"
+            variant="h6"
             sx={{
               fontWeight: "bold",
               color: "#3f51b5",
@@ -230,7 +311,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
 
         <Box sx={{ marginBottom: "10px" }}>
           <Typography
-            variant="h5"
+            variant="h6"
             sx={{
               fontWeight: "bold",
               color: "#3f51b5",
@@ -278,7 +359,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
         {/* Experience Section */}
 
         <Typography
-          variant="h5"
+          variant="h6"
           sx={{
             fontWeight: "bold",
             color: "#3f51b5",
@@ -372,46 +453,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
         />
         {/* Education Section */}
         <Box sx={{ marginBottom: "10px" }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: "bold",
-              color: "#3f51b5",
-              marginBottom: "10px",
-              breakInside: "avoid", // Prevents breaking within this line
-              pageBreakInside: "avoid",
-            }}
-          >
-            Education Details
-          </Typography>
-          {educationDetails ? (
-            educationDetails.split("\n").map((value, index) => (
-              <Typography
-                key={index}
-                variant="body2"
-                sx={{
-                  color: "#424242",
-                  whiteSpace: "pre-wrap",
-                  breakInside: "avoid", // Prevents breaking within this line
-                  pageBreakInside: "avoid",
-                }}
-              >
-                {value
-                    .split(/(#.*?#)/)
-                    .map((part, i) =>
-                      part.startsWith("#") && part.endsWith("#") ? (
-                        <strong key={i}>{part.replace(/#/g, "")}</strong>
-                      ) : (
-                        part
-                      )
-                    )}
-              </Typography>
-            ))
-          ) : (
-            <Typography variant="body2" sx={{ color: "#424242" }}>
-              Mention your educational qualifications in a crisp manner.
-            </Typography>
-          )}
+          <EducationDetails educationDetails={educationDetails} color="#3f51b5"/>
         </Box>
 {certification &&
         <Divider
@@ -425,7 +467,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
         {certification &&
         <Box sx={{ marginBottom: "10px" }}>
           <Typography
-            variant="h5"
+            variant="h6"
             sx={{
               fontWeight: "bold",
               color: "#3f51b5",
@@ -473,7 +515,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
 
         <Box sx={{ marginBottom: "10px" }}>
           <Typography
-            variant="h5"
+            variant="h6"
             sx={{
               fontWeight: "bold",
               color: "#3f51b5",
@@ -526,7 +568,7 @@ const DigitalProfile = ({ formData, dynamicNavigation, handleSubmit }) => {
         {personalDetails &&
         <Box sx={{ marginBottom: "10px" }}>
           <Typography
-            variant="h5"
+            variant="h6"
             sx={{
               fontWeight: "bold",
               color: "#3f51b5",
