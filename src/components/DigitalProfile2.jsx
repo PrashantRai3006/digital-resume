@@ -11,6 +11,7 @@ import {
   ListItem,
 } from "@mui/material";
 import html2pdf from "html2pdf.js";
+import EducationDetails from "../FormComponents/EducationDetails";
 const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
   const {
     name,
@@ -30,23 +31,87 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
   const resumeRef = useRef();
   const [image, setImage] = useState("/static/images/avatar/1.jpg");
   const handleDownload = async () => {
-    const pdf = new jsPDF("p", "pt", "a4"); // 'pt' for point units, 'a4' for standard page size
-    const element = resumeRef.current;
-
-    pdf.html(element, {
-      callback: function (doc) {
-        doc.save("Resume.pdf");
-      },
-      x: 0, // Left padding
-      y: 0, // Top padding
-      html2canvas: {
-        scale: 0.675, // Adjust the scale for better quality without excessive zoom
-      },
-      margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
-      autoPaging: true, // Ensures multi-page support
-    });
-    dynamicNavigation("/thank-you");
-  };
+      const pdf = new jsPDF("p", "px", "a4");
+  
+      const element = resumeRef.current;
+      if (!element) return;
+  
+      // Hide links temporarily
+      element.querySelectorAll("a").forEach((link) => {
+        link.style.visibility = "hidden";
+      });
+  
+      // Capture element size dynamically
+      const originalWidth = element.scrollWidth;
+      const originalHeight = element.scrollHeight;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const scaleFactor = pageWidth / originalWidth;
+  
+      await pdf.html(element, {
+        callback: function (doc) {
+          setTimeout(() => {
+            const links = element.querySelectorAll("a");
+            const parentRect = element.getBoundingClientRect();
+            links.forEach((link) => {
+              const text = link.textContent || "";
+              const href = link.href;
+              const rect = link.getBoundingClientRect();
+  
+              let x = (rect.left - parentRect.left) * scaleFactor;
+              let y = (rect.top - parentRect.top) * scaleFactor + 28.5;
+  
+              // 🔹 Fix multi-page positioning
+              let pageNumber = Math.floor(y / pageHeight) + 1;
+  
+              // ✅ Force links onto the first page if y is within range
+              if (y < pageHeight) {
+                pageNumber = 1;
+              }
+  
+              let adjustedY = y % pageHeight; // Reset y per page
+  
+              if (pageNumber > 1) {
+                while (doc.internal.pages.length < pageNumber) {
+                  doc.addPage();
+                }
+                doc.setPage(pageNumber);
+              } else {
+                doc.setPage(1);
+              }
+  
+              console.log(
+                `Adding Link: ${text} on Page ${pageNumber} at (${x}, ${adjustedY})`
+              );
+              doc.setFont("Helvetica", "normal");
+              doc.setFontSize(10);
+              doc.setTextColor(0, 0, 255);
+              doc.textWithLink(text, x, adjustedY, { url: href });
+            });
+  
+            doc.save("Resume.pdf");
+          }, 500);
+        },
+  
+        html2canvas: {
+          scale: scaleFactor, // Fixes zoom issue
+          useCORS: true,
+          logging: false,
+          dpi: 96,
+          width: originalWidth,
+          height: originalHeight,
+        },
+        margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
+      autoPaging: true, 
+      });
+  
+      // Restore links after rendering
+      setTimeout(() => {
+        element.querySelectorAll("a").forEach((link) => {
+          link.style.visibility = "visible";
+        });
+      }, 1000);
+    };
 
   const handleAvatarClick = () => {
     document.getElementById("avatar-upload").click(); // ✅ Triggers file input click
@@ -64,7 +129,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
       <Box
         ref={resumeRef}
         sx={{
-          padding: "20px 40px",
+          padding: "10px 40px",
           maxWidth: "800px",
           margin: "auto",
           borderRadius: "10px",
@@ -129,12 +194,11 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                       {exp.responsibilities
                         .split("\n")
                         .map((responsibility, i) => {
-                          
                           return (
                             <Typography
                               key={i}
                               color="textPrimary"
-                              variant= "body1"
+                              variant="body1"
                               sx={{
                                 display: "block",
                                 breakInside: "avoid", // Prevents breaking within this line
@@ -143,14 +207,16 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                               }}
                             >
                               {responsibility
-                    .split(/(#.*?#)/)
-                    .map((part, i) =>
-                      part.startsWith("#") && part.endsWith("#") ? (
-                        <strong key={i}>{part.replace(/#/g, "")}</strong>
-                      ) : (
-                        part
-                      )
-                    )}
+                                .split(/(#.*?#)/)
+                                .map((part, i) =>
+                                  part.startsWith("#") && part.endsWith("#") ? (
+                                    <strong key={i}>
+                                      {part.replace(/#/g, "")}
+                                    </strong>
+                                  ) : (
+                                    part
+                                  )
+                                )}
                             </Typography>
                           );
                         })}
@@ -171,41 +237,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
 
             {/* Education Section */}
             <Box sx={{ marginBottom: "10px" }}>
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                color="textPrimary"
-                pt="20px"
-              >
-                Education Details
-              </Typography>
-              {educationDetails ? (
-                educationDetails.split("\n").map((value, index) => (
-                  <Typography
-                    key={index}
-                    variant="body1"
-                    sx={{
-                      whiteSpace: "pre-wrap",
-                      breakInside: "avoid", // Prevents breaking within this line
-                      pageBreakInside: "avoid",
-                    }}
-                  >
-                    {value
-                    .split(/(#.*?#)/)
-                    .map((part, i) =>
-                      part.startsWith("#") && part.endsWith("#") ? (
-                        <strong key={i}>{part.replace(/#/g, "")}</strong>
-                      ) : (
-                        part
-                      )
-                    )}
-                  </Typography>
-                ))
-              ) : (
-                <Typography variant="body1">
-                  Mention your educational qualifications in a crisp manner.
-                </Typography>
-              )}
+              <EducationDetails educationDetails={educationDetails} />
             </Box>
           </Grid>
           <Grid item xs={4}>
@@ -269,14 +301,16 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                             }}
                           >
                             {skill
-                    .split(/(#.*?#)/)
-                    .map((part, i) =>
-                      part.startsWith("#") && part.endsWith("#") ? (
-                        <strong key={i}>{part.replace(/#/g, "")}</strong>
-                      ) : (
-                        part
-                      )
-                    )}
+                              .split(/(#.*?#)/)
+                              .map((part, i) =>
+                                part.startsWith("#") && part.endsWith("#") ? (
+                                  <strong key={i}>
+                                    {part.replace(/#/g, "")}
+                                  </strong>
+                                ) : (
+                                  part
+                                )
+                              )}
                           </Typography>
                         </ListItem>
                       ))}
@@ -342,48 +376,50 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
               </Grid>
             </Box>
             {/* {certification} */}
-            {certification &&
-            <Box sx={{ marginBottom: "10px" }}>
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                color="textPrimary"
-                sx={{ marginTop: "20px" }} // Replaced pt with marginTop for better spacing
-              >
-                Certificates
-              </Typography>
-              <Grid container>
-                {certification &&  (
-                  <Grid item xs={12}>
-                    <List sx={{ padding: 0 }}>
-                      {certification.split('\n').map((certificate, index) => (
-                        <ListItem key={index} sx={{ padding: 0 }}>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              breakInside: "avoid", // Prevents breaking within this line
-                              pageBreakInside: "avoid",
-                              whiteSpace: "pre-wrap",
-                            }}
-                          >
-                            {certificate
-                    .split(/(#.*?#)/)
-                    .map((part, i) =>
-                      part.startsWith("#") && part.endsWith("#") ? (
-                        <strong key={i}>{part.replace(/#/g, "")}</strong>
-                      ) : (
-                        part
-                      )
-                    )}
-                          </Typography>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Grid>
-                ) }
-              </Grid>
-            </Box>
-}
+            {certification && (
+              <Box sx={{ marginBottom: "10px" }}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="textPrimary"
+                  sx={{ marginTop: "20px" }} // Replaced pt with marginTop for better spacing
+                >
+                  Certificates
+                </Typography>
+                <Grid container>
+                  {certification && (
+                    <Grid item xs={12}>
+                      <List sx={{ padding: 0 }}>
+                        {certification.split("\n").map((certificate, index) => (
+                          <ListItem key={index} sx={{ padding: 0 }}>
+                            <Typography
+                              variant="body1"
+                              sx={{
+                                breakInside: "avoid", // Prevents breaking within this line
+                                pageBreakInside: "avoid",
+                                whiteSpace: "pre-wrap",
+                              }}
+                            >
+                              {certificate
+                                .split(/(#.*?#)/)
+                                .map((part, i) =>
+                                  part.startsWith("#") && part.endsWith("#") ? (
+                                    <strong key={i}>
+                                      {part.replace(/#/g, "")}
+                                    </strong>
+                                  ) : (
+                                    part
+                                  )
+                                )}
+                            </Typography>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Grid>
+                  )}
+                </Grid>
+              </Box>
+            )}
 
             <Typography
               variant="h6"
@@ -393,38 +429,23 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
             >
               Work Id's
             </Typography>
-            <Grid container>
-              {workIds && workIds.length > 0 ? (
-                <Grid item xs={12}>
-                  <List sx={{ padding: 0 }}>
-                    {" "}
-                    {/* Removed padding */}
-                    {workIds.map((workId, index) => (
-                      <ListItem key={index} sx={{ padding: 0 }}>
-                        {" "}
-                        {/* Removed padding */}
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            breakInside: "avoid", // Prevents breaking within this line
-                            pageBreakInside: "avoid",
-                            whiteSpace: "pre-wrap",
-                          }}
-                        >
-                          {workId}
-                        </Typography>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Grid>
-              ) : (
-                <Grid item xs={12}>
-                  <Typography variant="body1" sx={{ color: "#424242" }}>
-                    Add your work Id's to showcase your expertise
-                  </Typography>
-                </Grid>
-              )}
-            </Grid>
+<Typography variant="body1" sx={{display:'flex', flexDirection:'column', gap:'5px'}}>
+              {Boolean(workIds.length)
+                ? workIds.map((work, index) => (
+                    <a
+                      key={index}
+                      href={work.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        marginRight: "5px",
+                      }}
+                    >
+                      {work.label || "Untitled"}
+                    </a>
+                  ))
+                : "Add your work Id's to showcase your expertise"}
+            </Typography>
           </Grid>
         </Grid>
       </Box>
@@ -442,7 +463,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => dynamicNavigation('/form')}
+          onClick={() => dynamicNavigation("/form")}
           sx={{
             borderRadius: "8px",
             padding: "10px 20px",

@@ -31,9 +31,15 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
   const [workIds, setWorkIds] = useState(formData.workIds || []);
   const [softSkills, setSoftSkills] = useState(formData.softSkills || []);
   const [newSoftSkill, setNewSoftSkill] = useState("");
-  
+  const [newEducation, setNewEducation] = useState({
+    school: "",
+    startYear: "",
+    endYear: "",
+    percentage: "",
+  });
+  const [newWork, setNewWork] = useState({ label: "", link: "" });
   const [educationDetails, setEducationDetails] = useState(
-    formData.educationDetails || ""
+    formData.educationDetails || []
   );
   const [certification, setCertification] = useState(
     formData.certification || ""
@@ -42,19 +48,59 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
   const [personalDetails, setPersonalDetails] = useState(
     formData.personalDetails || ""
   );
-  
+  const handleAddEducation = () => {
+    if (
+      newEducation.school.trim() &&
+      newEducation.startYear &&
+      newEducation.endYear &&
+      newEducation.percentage
+    ) {
+      setEducationDetails([...educationDetails, newEducation]);
+      setNewEducation({
+        school: "",
+        startYear: "",
+        endYear: "",
+        percentage: "",
+      }); // Reset input fields
+    }
+  };
 
-const handleLogout = async () => {
-  try {
-    await signOut(auth);
-    console.log("User logged out successfully!");
-    // Redirect user to login page after logout
-    window.location.href = "/login"; 
-  } catch (error) {
-    console.error("Error logging out:", error);
-  }
-};
+  const handleEducationChange = (index, field, value) => {
+    const updatedEducation = [...educationDetails];
+    updatedEducation[index][field] = value;
+    setEducationDetails(updatedEducation);
+  };
 
+  const handleRemoveEducation = (index) => {
+    setEducationDetails(educationDetails.filter((_, i) => i !== index));
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      console.log("User logged out successfully!");
+      // Redirect user to login page after logout
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+  const handleAddWorkId = () => {
+    if (newWork.label.trim() && newWork.link.trim()) {
+      setWorkIds([...workIds, newWork]);
+      setNewWork({ label: "", link: "" }); // Reset input fields
+    }
+  };
+
+  const handleWorkIdChange = (index, field, value) => {
+    const updatedWorkIds = [...workIds];
+    updatedWorkIds[index][field] = value;
+    setWorkIds(updatedWorkIds);
+  };
+
+  const handleRemoveWorkId = (index) => {
+    setWorkIds(workIds.filter((_, i) => i !== index));
+  };
 
   const handleAddSkill = () => {
     if (newSkill.trim() !== "") {
@@ -68,12 +114,6 @@ const handleLogout = async () => {
       setNewSoftSkill("");
     }
   };
-  const handleAddWorkId = () => {
-    if (workId.trim() !== "") {
-      setWorkIds([...workIds, workId]);
-      setWorkId("");
-    }
-  };
 
   const handleRemoveSkill = (index) => {
     const updatedSkills = skills.filter((_, i) => i !== index);
@@ -82,10 +122,6 @@ const handleLogout = async () => {
   const handleRemoveSoftSkill = (index) => {
     const updatedSkills = softSkills.filter((_, i) => i !== index);
     setSoftSkills(updatedSkills);
-  };
-  const handleRemoveWorkId = (index) => {
-    const updatedWorkId = workIds.filter((_, i) => i !== index);
-    setWorkIds(updatedWorkId);
   };
 
   const handleAddExperience = () => {
@@ -191,47 +227,45 @@ const handleLogout = async () => {
       }}
     >
       <Box
-  sx={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "20px 0px",
-    position: "relative",
-  }}
->
-  <Typography
-    variant="h4"
-    sx={{
-      textAlign: "center",
-      color: "#3f51b5",
-      fontWeight: "bold",
-      position: "absolute",
-      left: "50%",
-      transform: "translateX(-50%)",
-    }}
-  >
-    Create Your Professional Resume
-  </Typography>
-  <Button
-    variant="contained"
-    color="error"
-    onClick={handleLogout}
-    startIcon={<LogoutIcon />}
-    sx={{
-      borderRadius: "8px",
-      padding: "10px 24px",
-      fontWeight: "bold",
-      backgroundColor: "#d32f2f",
-      '&:hover': { backgroundColor: "#b71c1c" },
-      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-      marginLeft: "auto",
-    }}
-  >
-    Log Out
-  </Button>
-</Box>
-
-
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "20px 0px",
+          position: "relative",
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            textAlign: "center",
+            color: "#3f51b5",
+            fontWeight: "bold",
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          Create Your Professional Resume
+        </Typography>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleLogout}
+          startIcon={<LogoutIcon />}
+          sx={{
+            borderRadius: "8px",
+            padding: "10px 24px",
+            fontWeight: "bold",
+            backgroundColor: "#d32f2f",
+            "&:hover": { backgroundColor: "#b71c1c" },
+            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+            marginLeft: "auto",
+          }}
+        >
+          Log Out
+        </Button>
+      </Box>
 
       {/* Basic Information */}
       <Grid container spacing={2}>
@@ -271,44 +305,91 @@ const handleLogout = async () => {
             onChange={(e) => setRole(e.target.value)}
           />
         </Grid>
-        {Boolean(workIds.length) && (
-          <Grid item xs={12}>
+
+        <Grid item xs={12}>
+          <Typography variant="h5" sx={{ color: "#3f51b5" }}>
+            Work Ids
+          </Typography>
+          {Boolean(workIds.length) && (
             <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-              {workIds.map((value, index) => (
+              {workIds.map((work, index) => (
                 <Box
                   key={index}
                   sx={{
                     display: "flex",
                     alignItems: "center",
                     backgroundColor: "aliceblue",
-                    padding: "8px 16px",
                     borderRadius: "16px",
-                    margin: "5px",
+                    margin: "5px 0px",
+                    width: "100%",
                   }}
                 >
-                  <Typography sx={{ marginRight: "10px", fontWeight: "500" }}>
-                    {value}
-                  </Typography>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleRemoveWorkId(index)}
-                    color="error"
-                  >
-                    <DeleteForever />
-                  </IconButton>
+                  <Grid container spacing={2}>
+                    <Grid item xs={5.5}>
+                      <TextField
+                        fullWidth
+                        
+                        required
+                        value={work.label}
+                        onChange={(e) =>
+                          handleWorkIdChange(index, "label", e.target.value)
+                        }
+                        placeholder="e.g., LinkedIn, Portfolio"
+                        sx={{ background: "white", borderRadius: "8px" }}
+                      />
+                    </Grid>
+                    <Grid item xs={5.5}>
+                      <TextField
+                      
+                        required
+                        value={work.link}
+                        onChange={(e) =>
+                          handleWorkIdChange(index, "link", e.target.value)
+                        }
+                        placeholder="Enter link"
+                        sx={{ background: "white", borderRadius: "8px" }}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      xs={1}
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <IconButton
+                        size="small"
+                        onClick={() => handleRemoveWorkId(index)}
+                        color="error"
+                      >
+                        <DeleteForever />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
                 </Box>
               ))}
             </Box>
-          </Grid>
-        )}
-        <Grid item xs={11}>
+          )}
+        </Grid>
+
+        <Grid item xs={5.5}>
           <TextField
             fullWidth
-            label="Work ID"
+            label="Label"
             required
-            value={workId}
-            onChange={(e) => setWorkId(e.target.value)}
-            placeholder="Enter LinkedIn, Naukri, Behance, Portfolio, or Slack ID"
+            value={newWork.label}
+            onChange={(e) => setNewWork({ ...newWork, label: e.target.value })}
+            placeholder="e.g., LinkedIn, Portfolio"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
+        </Grid>
+        <Grid item xs={5.5}>
+          <TextField
+            fullWidth
+            label="Link"
+            required
+            value={newWork.link}
+            onChange={(e) => setNewWork({ ...newWork, link: e.target.value })}
+            placeholder="Enter link"
             onKeyPress={(e) => e.key === "Enter" && handleAddWorkId()}
             sx={{ background: "white", borderRadius: "8px" }}
           />
@@ -350,25 +431,202 @@ const handleLogout = async () => {
         </Grid>
         {/* Education Details */}
         <Grid item xs={12}>
-          <Typography
-            variant="h5"
-            sx={{ color: "#3f51b5", marginBottom: "16px" }}
-          >
-            Education Details
-          </Typography>
+  <Typography variant="h5" sx={{ color: "#3f51b5", marginBottom: "16px" }}>
+    Education Details
+  </Typography>
+  <Grid container spacing={2}>
+    {/* Display Added Education Entries */}
+    {Boolean(educationDetails.length) && (
+      <Grid item xs={12}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {educationDetails.map((edu, index) => (
+            <Grid
+              container
+              key={index}
+              spacing={2}
+              sx={{
+                alignItems: "center",
+                backgroundColor: "aliceblue",
+                
+                borderRadius: "12px",
+              }}
+            >
+              <Grid item xs={3.6}>
+                <TextField
+                  fullWidth
+                  required
+                  value={edu.school}
+                  onChange={(e) =>
+                    handleEducationChange(index, "school", e.target.value)
+                  }
+                  placeholder="Enter College/School"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <TextField
+                  fullWidth
+                  required
+                  value={edu.degree}
+                  onChange={(e) =>
+                    handleEducationChange(index, "degree", e.target.value)
+                  }
+                  placeholder="Degree"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
+              </Grid>
+              <Grid item xs={1.8}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  required
+                  value={edu.startYear}
+                  onChange={(e) =>
+                    handleEducationChange(index, "startYear", e.target.value)
+                  }
+                  placeholder="YYYY"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
+              </Grid>
+              <Grid item xs={1.8}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  required
+                  value={edu.endYear}
+                  onChange={(e) =>
+                    handleEducationChange(index, "endYear", e.target.value)
+                  }
+                  placeholder="YYYY"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
+              </Grid>
+              <Grid item xs={1.8}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  required
+                  value={edu.percentage}
+                  onChange={(e) =>
+                    handleEducationChange(index, "percentage", e.target.value)
+                  }
+                  placeholder="%"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
+              </Grid>
+              <Grid item xs={1}>
+                <IconButton
+                  size="small"
+                  onClick={() => handleRemoveEducation(index)}
+                  color="error"
+                >
+                  <DeleteForever />
+                </IconButton>
+              </Grid>
+            </Grid>
+          ))}
+        </Box>
+      </Grid>
+    )}
+
+    {/* Input Fields for Adding a New Entry */}
+    <Grid item xs={12}>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={3.6}>
           <TextField
             fullWidth
-            multiline
-            rows={4}
-            value={educationDetails}
-            onChange={(e) => setEducationDetails(e.target.value)}
-            placeholder="Enter your education details like degree, college, year of passing, etc. after each detail press enter"
-            sx={{
-              background: "white",
-              borderRadius: "8px",
-            }}
+            label="College/School"
+            required
+            value={newEducation.school}
+            onChange={(e) =>
+              setNewEducation({ ...newEducation, school: e.target.value })
+            }
+            placeholder="Enter College/School"
+            sx={{ background: "white", borderRadius: "8px" }}
           />
         </Grid>
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            label="Degree"
+            required
+            value={newEducation.degree}
+            onChange={(e) =>
+              setNewEducation({ ...newEducation, degree: e.target.value })
+            }
+            placeholder="Degree"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
+        </Grid>
+        <Grid item xs={1.8}>
+          <TextField
+            fullWidth
+            label="Start Year"
+            type="number"
+            required
+            value={newEducation.startYear}
+            onChange={(e) =>
+              setNewEducation({
+                ...newEducation,
+                startYear: e.target.value,
+              })
+            }
+            placeholder="YYYY"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
+        </Grid>
+        <Grid item xs={1.8}>
+          <TextField
+            fullWidth
+            label="End Year"
+            type="number"
+            required
+            value={newEducation.endYear}
+            onChange={(e) =>
+              setNewEducation({
+                ...newEducation,
+                endYear: e.target.value,
+              })
+            }
+            placeholder="YYYY"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
+        </Grid>
+        <Grid item xs={1.8}>
+          <TextField
+            fullWidth
+            label="Percentage"
+            type="number"
+            required
+            value={newEducation.percentage}
+            onChange={(e) =>
+              setNewEducation({
+                ...newEducation,
+                percentage: e.target.value,
+              })
+            }
+            placeholder="%"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
+        </Grid>
+        <Grid item xs={1}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddEducation}
+            sx={{
+              borderRadius: "16px",
+              height: "56px",
+            }}
+          >
+            Add
+          </Button>
+        </Grid>
+      </Grid>
+    </Grid>
+  </Grid>
+</Grid>
+
         {/* Certification */}
         <Grid item xs={12}>
           <Typography
