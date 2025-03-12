@@ -149,7 +149,9 @@ const handleDownload = async () => {
           element.querySelectorAll("a").forEach((link) => {
             link.style.visibility = "visible";
           });
+          dynamicNavigation("/thank-you");
         }, 1000);
+        
       };
   const handleAvatarClick = () => {
     document.getElementById("avatar-upload").click(); // ✅ Triggers file input click

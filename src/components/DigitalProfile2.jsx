@@ -110,7 +110,9 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
         element.querySelectorAll("a").forEach((link) => {
           link.style.visibility = "visible";
         });
+        dynamicNavigation("/thank-you");
       }, 1000);
+      
     };
 
   const handleAvatarClick = () => {
