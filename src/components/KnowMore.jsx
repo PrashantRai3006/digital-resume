@@ -1,34 +1,38 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Grid, CircularProgress, Box, Typography } from "@mui/material";
-import templates from "../data/templates";
+import { Grid, Box, Typography } from "@mui/material";
 import Lottie from "lottie-react";
 import { ReactTyped } from "react-typed";
-import typingAnimation from "../data/typingAnimation.json"; // Replace with your Lottie JSON file
+import { motion } from "framer-motion";
+import typingAnimation from "../data/typingAnimation.json";
+import scrollAnimation from "../data/scrollAnimation.json";
+import templates from "../data/templates";
+import ChooseUs from "./ChooseUs";
 
-export default function KnowMore() {
-  const [loading, setLoading] = useState(false);
+export default function KnowMore({dynamicNavigation,user}) {
+  const [isHovered, setIsHovered] = useState(false);
   const imageContainerRef = useRef(null);
 
-  // Auto-scroll effect
   useEffect(() => {
     const scrollContainer = imageContainerRef.current;
-    if (!scrollContainer) return;
+    if (!scrollContainer || isHovered) return;
 
-    const scrollInterval = setInterval(() => {
-      // If reached the bottom, reset to top
+    let scrollSpeed = 1;
+    let scrollInterval = setInterval(() => {
       if (
         scrollContainer.scrollTop + scrollContainer.clientHeight >=
         scrollContainer.scrollHeight
       ) {
-        scrollContainer.scrollTop = 0; // Reset scroll position
+        scrollContainer.scrollTop = 0;
       } else {
-        scrollContainer.scrollBy({ top: 1, behavior: "smooth" });
+        scrollContainer.scrollBy({ top: scrollSpeed, behavior: "smooth" });
       }
-    }, 50); // Adjust speed by changing interval
+    }, 50);
 
     return () => clearInterval(scrollInterval);
-  }, []);
-
+  }, [isHovered]);
+  const scrollToNextSection = () => {
+    document.getElementById("choose-us")?.scrollIntoView({ behavior: "smooth" });
+  };
   return (
     <>
       <Grid
@@ -37,31 +41,60 @@ export default function KnowMore() {
         sx={{
           padding: "40px",
           background: "linear-gradient(135deg, #000428, #004e92)",
+          position: "relative",
+          color: "white",
         }}
       >
+        {/* Left Section */}
         <Grid item xs={8}>
           <Grid
             container
             spacing={2}
             sx={{ p: 2, height: "100%", width: "100%" }}
           >
+            {/* Header Section */}
+            <Grid item xs={12} sx={{ textAlign: "center" }}>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                mb={2}
+                sx={{
+                  background: "linear-gradient(to right, #ff8c00, #ffffff)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                📄 Create Your Perfect Resume
+              </Typography>
+
+              <Typography
+                variant="h5"
+                fontWeight="bold"
+                sx={{
+                  background: "linear-gradient(to right, #ff8c00, #ffffff)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                ✨ How to Highlight Text?
+              </Typography>
+            </Grid>
+
+            {/* Help Section */}
+
             <Grid
               item
               xs={12}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              sx={{ display: "flex", justifyContent: "center" }}
             >
               <Box
                 sx={{
-                  width: "60%",
-                  height: "60%",
-                  marginTop: "-200px",
+                  width: "70%",
+                  height: "80%",
                   borderRadius: 2,
                   position: "relative",
                   overflow: "hidden",
+                  marginTop: "-150px",
                 }}
               >
                 <Lottie
@@ -69,14 +102,13 @@ export default function KnowMore() {
                   style={{ width: "100%", height: "100%" }}
                 />
 
-                {/* Hover Effect: Expands Height Dynamically */}
                 <Box
                   sx={{
                     position: "absolute",
                     bottom: 0,
                     width: "100%",
-                    height: "15%", // Initial height
-                    background: "rgba(255, 255, 255, 0.9)", // Light background for contrast
+                    height: "20%",
+                    background: "rgba(255, 255, 255, 0.9)",
                     color: "black",
                     transition: "height 0.3s ease-in-out",
                     display: "flex",
@@ -85,7 +117,7 @@ export default function KnowMore() {
                     padding: "10px",
                     cursor: "pointer",
                     "&:hover": {
-                      height: "max(30%, 40%)", // Expands based on content height
+                      height: "max(30%, 60%)",
                     },
                   }}
                 >
@@ -103,45 +135,99 @@ export default function KnowMore() {
                   </Typography>
                   <Typography
                     variant="h4"
-                    sx={{ fontWeight: "bold",marginBottom:"16px" }}
+                    sx={{ fontWeight: "bold", marginBottom: "16px" }}
                   >
                     ↓
                   </Typography>
                   <Box px={6}>
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                  Enclose words or sentences within #...# in Profile Summary, Responsibilities, Skills, Personal Details, and Certificates to highlight them in bold.
-                  </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                      Enclose words or sentences within #...# in Profile
+                      Summary, Responsibilities, Skills, Personal Details, and
+                      Certificates to highlight them in bold.
+                    </Typography>
                   </Box>
                 </Box>
               </Box>
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={3}>
-          {/* Scrollable Container */}
-          <div
-            ref={imageContainerRef}
-            style={{
-              height: "100vh", // Adjust height as needed
+
+        {/* Right Section (Resume Templates) */}
+        <Grid item xs={12} md={3} sx={{ height: "100vh" }}>
+          <Box
+            sx={{
+              height: "100%",
               overflow: "hidden",
               display: "flex",
               flexDirection: "column",
+              borderRadius: "15px",
+              padding: "20px",
+              background: "rgba(255, 255, 255, 0.1)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0px 8px 20px rgba(255, 255, 255, 0.2)",
+              textAlign: "center",
             }}
+            ref={imageContainerRef}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              sx={{ color: "white", marginBottom: "10px" }}
+            >
+              Resume Templates
+            </Typography>
+
             {templates.map((src, index) => (
-              <div key={index} style={{ margin: "30px" }}>
-                <img
+              <motion.div
+                key={index}
+                style={{ margin: "20px 0" }}
+                whileHover={{
+                  scale: 1.1,
+                  boxShadow: "0px 0px 15px rgba(255,255,255,0.5)",
+                }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                <motion.img
                   src={src.thumbnail}
                   alt={`Template ${index}`}
-                  style={{ width: "100%", borderRadius: "8px" }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                  style={{
+                    width: "100%",
+                    borderRadius: "8px",
+                    boxShadow: "0px 4px 15px rgba(255, 255, 255, 0.2)",
+                    cursor: "pointer",
+                  }}
                 />
-              </div>
+              </motion.div>
             ))}
-            {loading && <CircularProgress />}
-          </div>
+          </Box>
         </Grid>
-        <Grid item xs={1}></Grid>
+
+        {/* Scroll Animation */}
+        <Grid
+          item
+          xs={12}
+          sx={{
+            position: "absolute",
+            bottom: "100px",
+            width: "100%",
+            justifyContent: "center",
+            display: "flex",
+          }}
+        >
+          <Lottie onClick={scrollToNextSection}
+            animationData={scrollAnimation}
+            style={{ width: "15%", height: "15%" }}
+          />
+        </Grid>
       </Grid>
+      <Box id="choose-us">
+        <ChooseUs dynamicNavigation={dynamicNavigation} user={user}/>
+      </Box>
     </>
   );
 }

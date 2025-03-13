@@ -27,7 +27,7 @@ const ThankYouPage = ({ dynamicNavigation }) => {
       [letterIndex]: {
         transform: "translate(0, 0) scale(1)",
         transition: "transform 1s ease-out",
-        textShadow: "0px 0px 10px rgba(255, 255, 255, 0.8)",
+        textShadow: "0px 0px 10px rgba(144, 202, 249, 0.8)",
         opacity: 1,
       },
     }));
@@ -40,7 +40,7 @@ const ThankYouPage = ({ dynamicNavigation }) => {
         ? {
             transform: `translate(${Math.random() * 300 - 150}px, ${Math.random() * 300 - 150}px) scale(1.3)`,
             transition: "transform 1s ease-out",
-            textShadow: "0px 0px 20px rgba(255, 255, 255, 1)",
+            textShadow: "0px 0px 20px rgba(144, 202, 249, 1)",
             opacity: 0.8,
           }
         : {
@@ -50,6 +50,7 @@ const ThankYouPage = ({ dynamicNavigation }) => {
           },
     }));
   };
+
   const animatedText = (text) => {
     return text.split("").map((letter, index) => (
       <span
@@ -85,7 +86,6 @@ const ThankYouPage = ({ dynamicNavigation }) => {
         overflow: "hidden",
       }}
     >
-      {/* Twinkling Stars */}
       {[...Array(100)].map((_, i) => (
         <Box
           key={i}
@@ -105,12 +105,11 @@ const ThankYouPage = ({ dynamicNavigation }) => {
       <CheckCircleOutlineIcon
         sx={{
           fontSize: "100px",
-          color: "#4caf50",
+          color: "white",
           marginBottom: "20px",
         }}
       />
 
-      {/* Moving Letter Effect */}
       <Typography variant="h3" fontWeight="bold" mb={3}>
         {animatedText("Thank You!")}
       </Typography>
@@ -119,9 +118,8 @@ const ThankYouPage = ({ dynamicNavigation }) => {
         {animatedText("Your resume has been successfully created!")}
       </Typography>
 
-
       <Typography variant="h6" fontStyle="italic" fontWeight="bold" mb={4}>
-        {animatedText('Success is not the destination, but the journey of continuous improvement.')}
+        {animatedText("Success is not the destination, but the journey of continuous improvement.")}
       </Typography>
 
       <Button
@@ -129,20 +127,23 @@ const ThankYouPage = ({ dynamicNavigation }) => {
         size="large"
         onClick={() => dynamicNavigation("/")}
         sx={{
-          background: "white",
-          color: "#3f51b5",
+          background: "linear-gradient(135deg, #64b5f6, #1976d2)",
+          color: "white",
           borderRadius: "20px",
           padding: "10px 30px",
           fontWeight: "bold",
+          boxShadow: "0px 4px 15px rgba(25, 118, 210, 0.6)",
+          transition: "transform 0.3s ease, box-shadow 0.3s ease",
           "&:hover": {
-            background: "#f0f0f0",
+            background: "linear-gradient(135deg, #1976d2, #64b5f6)",
+            transform: "scale(1.05)",
+            boxShadow: "0px 6px 20px rgba(25, 118, 210, 0.9)",
           },
         }}
       >
         Go to Homepage
       </Button>
 
-      {/* Fixed Motivational Quote at Bottom */}
       <Typography
         variant="h6"
         fontStyle="italic"
@@ -163,7 +164,6 @@ const ThankYouPage = ({ dynamicNavigation }) => {
         No matter how much your life got messed up, it only requires one refresh to start again.
       </Typography>
 
-      {/* Keyframe animations */}
       <style>
         {`
           @keyframes twinkle {

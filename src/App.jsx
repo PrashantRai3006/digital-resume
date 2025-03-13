@@ -14,7 +14,7 @@ import ResumePreview from "./components/ResumePreview";
 
 const App = () => {
   const [formData, setFormData] = useState(() => {
-    const savedData = sessionStorage.getItem("formData");
+    const savedData = localStorage.getItem("formData");
     return savedData ? JSON.parse(savedData) : {};
   });
 
@@ -24,7 +24,7 @@ const App = () => {
 
   // Save formData to session storage on change
   useEffect(() => {
-    sessionStorage.setItem("formData", JSON.stringify(formData));
+    localStorage.setItem("formData", JSON.stringify(formData));
   }, [formData]);
 
   // Authenticate User
