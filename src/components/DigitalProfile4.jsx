@@ -130,7 +130,7 @@ const handleDownload = async () => {
             link.style.visibility = "visible";
           });
           dynamicNavigation("/thank-you");
-        }, 100);
+        }, 1000);
         
       };
   const handleAvatarClick = () => {

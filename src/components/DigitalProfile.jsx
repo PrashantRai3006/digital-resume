@@ -99,9 +99,10 @@ const DigitalProfile3 = ({ formData, dynamicNavigation, handleSubmit }) => {
     setTimeout(() => {
       element.querySelectorAll("a").forEach((link) => {
         link.style.visibility = "visible";
-        dynamicNavigation("/thank-you");
+        
       });
-    }, 100);
+      dynamicNavigation("/thank-you");
+    }, 1000);
     
   };
 
