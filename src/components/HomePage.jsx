@@ -3,6 +3,7 @@ import { Box, Typography, Button } from "@mui/material";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import KnowMore from "./KnowMore";
+import { motion } from "framer-motion"; // Animation Library
 const HomePage = ({ dynamicNavigation }) => {
   const [user, setUser] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -14,7 +15,6 @@ const HomePage = ({ dynamicNavigation }) => {
 
     return () => unsubscribe();
   }, []);
-  
 
   // Circular Parallax Effect
   useEffect(() => {
@@ -28,27 +28,29 @@ const HomePage = ({ dynamicNavigation }) => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
   const scrollToNextSection = () => {
-    document.getElementById("resume-section")?.scrollIntoView({ behavior: "smooth" });
+    document
+      .getElementById("resume-section")
+      ?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <>
-    <Box
-      sx={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        position: "relative",
-        overflow: "hidden",
-        color: "white",
-        textAlign: "center",
-      }}
-    >
-      {/* Background Animation */}
-      <style>
-        {`
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative",
+          overflow: "hidden",
+          color: "white",
+          textAlign: "center",
+        }}
+      >
+        {/* Background Animation */}
+        <style>
+          {`
           @keyframes twinkle {
             0% { opacity: 0.4; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.5); }
@@ -78,7 +80,7 @@ const HomePage = ({ dynamicNavigation }) => {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            background: radial-gradient(circle at center,  #000428 0%, #004e92 100%);
             z-index: -1;
             transform: translate(${mousePos.x}px, ${mousePos.y}px);
           }
@@ -129,72 +131,83 @@ const HomePage = ({ dynamicNavigation }) => {
             animation: bounce 1.5s infinite;
           }
         `}
-      </style>
+        </style>
 
-      {/* Slow Moving Circular Stars */}
-      <div className="stars">
-        {[...Array(100)].map((_, i) => (
-          <div
-            key={i}
-            className="star"
-            style={{
-              top: `${Math.random() * 100}vh`,
-              left: `${Math.random() * 100}vw`,
-              animationDuration: `${Math.random() * 10 + 8}s`,
-            }}
-          />
-        ))}
-      </div>
+        {/* Slow Moving Circular Stars */}
+        <div className="stars">
+          {[...Array(100)].map((_, i) => (
+            <div
+              key={i}
+              className="star"
+              style={{
+                top: `${Math.random() * 100}vh`,
+                left: `${Math.random() * 100}vw`,
+                animationDuration: `${Math.random() * 10 + 8}s`,
+              }}
+            />
+          ))}
+        </div>
 
-      {/* Text & CTA */}
-      <Typography variant="h2" fontWeight="bold" mb={3} className="glow-text">
-        Welcome to Digital Resume Builder
-      </Typography>
-      <Typography variant="h6" mb={2} className="glow-text">
-        Create stunning resumes with ease and sophistication.
-      </Typography>
+        {/* Text & CTA */}
+        <Typography variant="h2" fontWeight="bold" mb={3} className="glow-text">
+          Welcome to Digital Resume Builder
+        </Typography>
+        <Typography variant="h6" mb={2} className="glow-text">
+          Create stunning resumes with ease and sophistication.
+        </Typography>
 
-      {/* Inspirational Quote */}
-      <Typography
-        variant="h5"
-        fontStyle="italic"
-        fontWeight="light"
-        sx={{
-          opacity: 0.8,
-          mt: 2,
-          animation: "twinkle 10s infinite alternate",
-        }}
+        {/* Inspirational Quote */}
+        <Typography
+          variant="h5"
+          fontStyle="italic"
+          fontWeight="light"
+          sx={{
+            opacity: 0.8,
+            mt: 2,
+            animation: "twinkle 10s infinite alternate",
+          }}
+        >
+          Shine like the stars, build your future with us.
+        </Typography>
+        <motion.div
+        animate={{ y: [10, 0, 10] }}
+        transition={{ repeat: Infinity, duration: 2 }}
       >
-        Shine like the stars, build your future with us.
-      </Typography>
+        <Button
+  variant="contained"
+  onClick={() => dynamicNavigation(user ? "/form" : "/login")}
+  sx={{
+    mt: 5,
+    borderRadius: "50px",
+    padding: "12px 30px",
+    fontSize: "18px",
+    fontWeight: "bold",
+    background: "linear-gradient(135deg, #00bcd4, #0077b6)", // Teal to Blue Gradient
+    color: "white",
+    boxShadow: "0px 4px 20px rgba(0, 188, 212, 0.5)", // Cyan Glow
+    "&:hover": {
+      background: "linear-gradient(135deg, #0077b6, #00bcd4)", // Reverse Gradient on Hover
+      boxShadow: "0px 6px 25px rgba(0, 188, 212, 0.7)",
+    },
+  }}
+>
+  Create Your Resume Now 🚀
+</Button>
 
-      <Button
-        variant="contained"
-        color="secondary"
-        size="large"
-        onClick={() => dynamicNavigation(user ? "/form" : "/login")}
-        sx={{
-          borderRadius: "20px",
-          padding: "12px 36px",
-          fontSize: "1.2rem",
-          zIndex: 2,
-          mt: 3,
-        }}
-        className="cta-button"
-      >
-        Get Started
-      </Button>
-      <Box sx={{ position: "absolute", bottom: "20px" }}>
-      <Typography className="scroll-hint">Scroll down to learn more</Typography>
-      <Typography className="scroll-arrow" onClick={scrollToNextSection}>↓</Typography>
+                </motion.div>
+        <Box sx={{ position: "absolute", bottom: "20px" }}>
+          <Typography className="scroll-hint">
+            Scroll down to learn more
+          </Typography>
+          <Typography className="scroll-arrow" onClick={scrollToNextSection}>
+            ↓
+          </Typography>
+        </Box>
       </Box>
-    </Box>
-    <Box id="resume-section" >
-
-<KnowMore/>
-    </Box>
+      <Box id="resume-section">
+        <KnowMore dynamicNavigation={dynamicNavigation} user={user}/>
+      </Box>
     </>
-    
   );
 };
 

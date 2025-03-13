@@ -101,7 +101,7 @@ const DigitalProfile3 = ({ formData, dynamicNavigation, handleSubmit }) => {
         link.style.visibility = "visible";
         dynamicNavigation("/thank-you");
       });
-    }, 1000);
+    }, 100);
     
   };
 

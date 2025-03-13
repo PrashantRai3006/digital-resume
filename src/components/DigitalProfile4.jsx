@@ -47,26 +47,6 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
     // Apply the new height to the element
     element.style.minHeight = `${adjustedHeight}px`;
   };
-
-  //   const pdf = new jsPDF("p", "px", [794, 1123]); // A4 in px at 96 DPI
-  //   const element = resumeRef.current;
-
-  //   pdf.html(element, {
-  //     callback: function (doc) {
-  //       doc.save("Resume.pdf");
-  //     },
-  //     x: -30, // Left padding
-  //     y: -30, // Top padding
-  //     html2canvas: {
-  //       dpi: 300, // Match the DPI
-  //       scale: 1, // Adjust the scale for better quality without excessive zoom
-  //       backgroundColor: null, // Ensure full-page background applies
-  //     },
-  //     margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
-  //     autoPaging: true, // Ensures multi-page support
-  //   });
-  //   dynamicNavigation("/thank-you");
-  // };
 const handleDownload = async () => {
         const pdf = new jsPDF("p", "px", "a4");
     
@@ -150,7 +130,7 @@ const handleDownload = async () => {
             link.style.visibility = "visible";
           });
           dynamicNavigation("/thank-you");
-        }, 1000);
+        }, 100);
         
       };
   const handleAvatarClick = () => {
