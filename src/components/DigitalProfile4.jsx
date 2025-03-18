@@ -118,7 +118,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
             );
             doc.setFont("Helvetica", "normal");
             doc.setFontSize(10);
-            doc.setTextColor(0, 0, 255);
+            doc.setTextColor('#008080');
             doc.textWithLink(text, x, adjustedY, { url: href });
           });
 
@@ -418,6 +418,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                       rel="noopener noreferrer"
                       style={{
                         marginRight: "5px",
+                        color:'#008080'
                       }}
                     >
                       {work.label || "Untitled"}
