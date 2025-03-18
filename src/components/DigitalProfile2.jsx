@@ -101,7 +101,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
           width: originalWidth,
           height: originalHeight,
         },
-        margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
+        margin: [20, 0, 30, 0], // Margins for top, left, bottom, right
       autoPaging: true, 
       });
   

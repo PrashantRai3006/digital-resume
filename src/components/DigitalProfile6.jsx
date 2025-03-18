@@ -30,23 +30,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
   } = formData;
   const resumeRef = useRef();
   const [image, setImage] = useState("/static/images/avatar/1.jpg");
-  useEffect(() => {
-    adjustHeight(); // Adjust height when component mounts or updates
-  }, []);
-  const adjustHeight = () => {
-    const element = resumeRef.current;
-    if (!element) return;
-
-    // Get the actual content height
-    let contentHeight = element.scrollHeight;
-
-    // Calculate the nearest multiple of 1123px
-    let pageCount = Math.ceil(contentHeight / 1123); // Number of pages required
-    let adjustedHeight = pageCount * 1123; // Total height should be multiple of 1123
-
-    // Apply the new height to the element
-    element.style.minHeight = `${adjustedHeight}px`;
-  };
+  
   const handleDownload = async () => {
     const pdf = new jsPDF("p", "px", "a4");
 
@@ -68,22 +52,6 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
     await pdf.html(element, {
       callback: function (doc) {
         setTimeout(() => {
-          const totalPages = doc.internal.pages.length - 1; // Exclude blank first entry
-
-          if (totalPages > 1) {
-            // Add bottom margin to the first page
-            doc.setPage(1);
-            doc.text("", 10, pageHeight - 20); // Creates spacing at the bottom of page 1
-
-            // Shift content down on the second page
-            doc.setPage(2);
-            const contentShift = 20; // Top margin for second page
-            const page2Content = doc.internal.pages[2]; // Get the second page's content
-
-            if (page2Content) {
-              page2Content.splice(1, 0, { text: "", x: 10, y: contentShift }); // Push content down
-            }
-          }
           const links = element.querySelectorAll("a");
           const parentRect = element.getBoundingClientRect();
           links.forEach((link) => {
@@ -92,7 +60,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
             const rect = link.getBoundingClientRect();
 
             let x = (rect.left - parentRect.left) * scaleFactor;
-            let y = (rect.top - parentRect.top) * scaleFactor + 8.5;
+            let y = (rect.top - parentRect.top) * scaleFactor + 33.5;
 
             // 🔹 Fix multi-page positioning
             let pageNumber = Math.floor(y / pageHeight) + 1;
@@ -118,16 +86,14 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
             );
             doc.setFont("Helvetica", "normal");
             doc.setFontSize(10);
-            doc.setTextColor(0, 0, 255);
+            doc.setTextColor('#60A5FA');
             doc.textWithLink(text, x, adjustedY, { url: href });
           });
 
           doc.save("Resume.pdf");
         }, 500);
       },
-      
 
-      // Top padding
       html2canvas: {
         scale: scaleFactor, // Fixes zoom issue
         useCORS: true,
@@ -136,7 +102,8 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
         width: originalWidth,
         height: originalHeight,
       },
-      autoPaging: true,
+      margin: [20, 0, 20, 0], // Margins for top, left, bottom, right
+      //autoPaging: true,
     });
 
     // Restore links after rendering
@@ -168,43 +135,83 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
           margin: "auto",
           borderRadius: "10px",
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-          height: "1123px",
         }}
       >
-        <Grid container sx={{ height: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            margin:'10px 40px 20px 40px',
+            //backgroundColor:'#1E3A8A'
+          }}
+        >
+          <Box pr={2}>
+            <Avatar
+              alt="User Avatar"
+              src={image} // ✅ Uses state to update image
+              sx={{
+                width: 130,
+                height: 130,
+                cursor: "pointer",
+                borderRadius: "0px",
+              }} // ✅ Ensures it's clickable
+              onClick={handleAvatarClick}
+            />
+            <input
+              type="file"
+              id="avatar-upload"
+              style={{ display: "none" }}
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </Box>
+          <Box sx={{backgroundColor:'#1E3A8A' ,flex:1 , padding :'16px'}}>
+            <Typography
+              variant="h4"
+              color="#FFD700"
+              sx={{ fontWeight: "bold",}}
+              
+            >
+              {name || "Your Name"}
+            </Typography>
+            <Typography variant="h6" color="#FFD700">
+              {role || "Your Role"}
+            </Typography>
+            <Typography variant="body2" color="#FFD700">
+              {number || "Your Phone"} | {email || "Your Email"} |
+              {Boolean(workIds.length)
+                ? workIds.map((work, index) => (
+                    <a
+                      key={index}
+                      href={work.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        marginRight: "5px",
+                        color:'#60A5FA'
+                      }}
+                    >
+                      {" " + work.label || "Untitled"}
+                    </a>
+                  ))
+                : "Add your work Id's to showcase your expertise"}
+            </Typography>
+          </Box>
+        </Box>
+        <Grid container>
           <Grid
             item
             xs={4}
             sx={{
-              padding: "40px 20px 20px 40px",
-              backgroundColor: "darkgrey",
-              height: "100%",
+              padding: "0px 20px 20px 40px",
             }}
           >
-            {/* Avatar */}
-            <Box pb={5}>
-              <Avatar
-                alt="User Avatar"
-                src={image} // ✅ Uses state to update image
-                sx={{ width: 108, height: 108, cursor: "pointer" }} // ✅ Ensures it's clickable
-                onClick={handleAvatarClick}
-              />
-              <input
-                type="file"
-                id="avatar-upload"
-                style={{ display: "none" }}
-                accept="image/*"
-                onChange={handleImageChange}
-              />
-            </Box>
-
             <Typography variant="h6" fontWeight="bold" color="textPrimary">
               CONTACT
             </Typography>
             <Divider
               sx={{
                 height: "0.5px",
-                backgroundColor: "white",
+                backgroundColor: "#60A5FA",
                 marginBottom: "2px",
               }}
             />
@@ -220,6 +227,8 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                 educationDetails={educationDetails}
                 divider={true}
                 size={4}
+                dividerColor="#60A5FA"
+                
               />
             </Box>
             {/* Skills Section */}
@@ -235,7 +244,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
               <Divider
                 sx={{
                   height: "0.5px",
-                  backgroundColor: "white",
+                  backgroundColor: "#60A5FA",
                   marginBottom: "2px",
                 }}
               />
@@ -300,7 +309,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
               <Divider
                 sx={{
                   height: "0.5px",
-                  backgroundColor: "white",
+                  backgroundColor: "#60A5FA",
                   marginBottom: "2px",
                 }}
               />
@@ -351,7 +360,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
                 <Divider
                   sx={{
                     height: "0.5px",
-                    backgroundColor: "white",
+                    backgroundColor: "#60A5FA",
                     marginBottom: "2px",
                   }}
                 />
@@ -390,52 +399,9 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
               </Box>
             )}
 
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              color="textPrimary"
-              pt="10px"
-            >
-              WORK ID'S
-            </Typography>
-            <Divider
-              sx={{
-                height: "0.5px",
-                backgroundColor: "white",
-                marginBottom: "2px",
-              }}
-            />
-            <Typography
-              variant="body1"
-              sx={{ display: "flex", flexDirection: "column", gap: "5px" }}
-            >
-              {Boolean(workIds.length)
-                ? workIds.map((work, index) => (
-                    <a
-                      key={index}
-                      href={work.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        marginRight: "5px",
-                      }}
-                    >
-                      {work.label || "Untitled"}
-                    </a>
-                  ))
-                : "Add your work Id's to showcase your expertise"}
-            </Typography>
+            
           </Grid>
-          <Grid item xs={8} sx={{ padding: "40px 40px 20px 20px" }}>
-            {/* Header */}
-            <Box pb={5}>
-              <Typography variant="h3" fontWeight="bold" pb={"20px"}>
-                {name || "Your Name"}
-              </Typography>
-              <Typography variant="h5" color="textSecondary">
-                {role || "Your Role"}
-              </Typography>
-            </Box>
+          <Grid item xs={8} sx={{ padding: "0px 40px 20px 20px" }}>
             {/* Profile Summary */}
             <Box sx={{ marginBottom: "10px" }}>
               <Typography variant="h6" fontWeight="bold" color="textPrimary">
@@ -444,7 +410,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
               <Divider
                 sx={{
                   height: "0.5px",
-                  backgroundColor: "black",
+                  backgroundColor: "#60A5FA",
                   marginBottom: "2px",
                 }}
               />
@@ -487,7 +453,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
             <Divider
               sx={{
                 height: "0.5px",
-                backgroundColor: "white",
+                backgroundColor: "#60A5FA",
                 marginBottom: "2px",
               }}
             />

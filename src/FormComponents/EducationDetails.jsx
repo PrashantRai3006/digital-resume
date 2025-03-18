@@ -1,6 +1,13 @@
 import { Box, Typography, Grid, Divider } from "@mui/material";
 
-export default function EducationDetails({ educationDetails, color, divider, size }) {
+export default function EducationDetails({
+  educationDetails,
+  color,
+  divider,
+  size,
+  dividerHeight,
+  dividerColor,
+}) {
   return (
     <Box>
       <Typography
@@ -15,7 +22,15 @@ export default function EducationDetails({ educationDetails, color, divider, siz
         Education Details
       </Typography>
 
-      {divider && <Divider sx={{ height: "0.5px", backgroundColor: "white", marginBottom: "2px" }} />}
+      {divider && (
+        <Divider
+          sx={{
+            height: dividerHeight || "0.5px",
+            backgroundColor: dividerColor || "white",
+            marginBottom: "2px",
+          }}
+        />
+      )}
 
       {educationDetails.length > 0 ? (
         size === 4 ? (
@@ -24,10 +39,23 @@ export default function EducationDetails({ educationDetails, color, divider, siz
             {educationDetails.map((edu, index) => (
               <Grid item xs={12} key={index}>
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Typography variant="body1" fontWeight={500}>
+                  <Typography
+                    variant="body1"
+                    fontWeight={500}
+                    sx={{
+                      breakInside: "avoid",
+                      pageBreakInside: "avoid",
+                    }}
+                  >
                     {edu.degree} | {edu.startYear} - {edu.endYear}
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      breakInside: "avoid",
+                      pageBreakInside: "avoid",
+                    }}
+                  >
                     {edu.school} {edu.percentage ? `- ${edu.percentage}%` : ""}
                   </Typography>
                 </Box>
