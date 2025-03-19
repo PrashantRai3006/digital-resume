@@ -106,7 +106,7 @@ const HomePage = ({ dynamicNavigation }) => {
           }
 
           .glow-text:hover {
-            text-shadow: 0px 0px 10px #fff, 0px 0px 20px #f39c12;
+            text-shadow: 0px 0px 10px #fff, 0px 0px 20px #00BFFF;
           }
 
           .cta-button {
@@ -170,32 +170,31 @@ const HomePage = ({ dynamicNavigation }) => {
           Shine like the stars, build your future with us.
         </Typography>
         <motion.div
-        animate={{ y: [10, 0, 10] }}
-        transition={{ repeat: Infinity, duration: 2 }}
-      >
-        <Button
-  variant="contained"
-  onClick={() => dynamicNavigation(user ? "/form" : "/login")}
-  sx={{
-    mt: 5,
-    borderRadius: "50px",
-    padding: "12px 30px",
-    fontSize: "18px",
-    fontWeight: "bold",
-    background: "linear-gradient(135deg, #00bcd4, #0077b6)", // Teal to Blue Gradient
-    color: "white",
-    boxShadow: "0px 4px 20px rgba(0, 188, 212, 0.5)", // Cyan Glow
-    "&:hover": {
-      background: "linear-gradient(135deg, #0077b6, #00bcd4)", // Reverse Gradient on Hover
-      boxShadow: "0px 6px 25px rgba(0, 188, 212, 0.7)",
-    },
-  }}
->
-  Create Your Resume Now 🚀
-</Button>
-
-                </motion.div>
-        <Box sx={{ position: "absolute", bottom: "20px" }}>
+          animate={{ y: [10, 0, 10] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+        >
+          <Button
+            variant="contained"
+            onClick={() => dynamicNavigation(user ? "/form" : "/login")}
+            sx={{
+              mt: 5,
+              borderRadius: "50px",
+              padding: "12px 30px",
+              fontSize: "18px",
+              fontWeight: "bold",
+              background: "linear-gradient(135deg, #00bcd4, #0077b6)", // Teal to Blue Gradient
+              color: "white",
+              boxShadow: "0px 4px 20px rgba(0, 188, 212, 0.5)", // Cyan Glow
+              "&:hover": {
+                background: "linear-gradient(135deg, #0077b6, #00bcd4)", // Reverse Gradient on Hover
+                boxShadow: "0px 6px 25px rgba(0, 188, 212, 0.7)",
+              },
+            }}
+          >
+            Create Your Resume Now 🚀
+          </Button>
+        </motion.div>
+        <Box sx={{ position: "absolute", bottom: "30px" }}>
           <Typography className="scroll-hint">
             Scroll down to learn more
           </Typography>
@@ -205,7 +204,7 @@ const HomePage = ({ dynamicNavigation }) => {
         </Box>
       </Box>
       <Box id="resume-section">
-        <KnowMore dynamicNavigation={dynamicNavigation} user={user}/>
+        <KnowMore dynamicNavigation={dynamicNavigation} user={user} />
       </Box>
     </>
   );

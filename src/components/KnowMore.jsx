@@ -4,7 +4,6 @@ import Lottie from "lottie-react";
 import { ReactTyped } from "react-typed";
 import { motion } from "framer-motion";
 import typingAnimation from "../data/typingAnimation.json";
-import scrollAnimation from "../data/scrollAnimation.json";
 import templates from "../data/templates";
 import ChooseUs from "./ChooseUs";
 
@@ -219,10 +218,14 @@ export default function KnowMore({dynamicNavigation,user}) {
             display: "flex",
           }}
         >
-          <Lottie onClick={scrollToNextSection}
-            animationData={scrollAnimation}
-            style={{ width: "15%", height: "15%" }}
-          />
+          <Box sx={{ position: "absolute", bottom: "20px" , display:'flex',flexDirection:'column',alignItems:'center'}}>
+                    <Typography className="scroll-hint">
+                      Scroll down to learn more
+                    </Typography>
+                    <Typography className="scroll-arrow" onClick={scrollToNextSection}>
+                      ↓
+                    </Typography>
+                  </Box>
         </Grid>
       </Grid>
       <Box id="choose-us">
