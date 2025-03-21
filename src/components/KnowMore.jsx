@@ -33,15 +33,16 @@ export default function KnowMore({dynamicNavigation,user}) {
     document.getElementById("choose-us")?.scrollIntoView({ behavior: "smooth" });
   };
   return (
-    <>
+    <Box sx={{background: "linear-gradient(135deg, #000428, #004e92)",}}>
       <Grid
         container
         spacing={2}
         sx={{
           padding: "40px",
-          background: "linear-gradient(135deg, #000428, #004e92)",
+          
           position: "relative",
           color: "white",
+          
         }}
       >
         {/* Left Section */}
@@ -218,11 +219,11 @@ export default function KnowMore({dynamicNavigation,user}) {
             display: "flex",
           }}
         >
-          <Box sx={{ position: "absolute", bottom: "20px" , display:'flex',flexDirection:'column',alignItems:'center'}}>
+          <Box sx={{ position: "absolute", bottom: "0px" , display:'flex',flexDirection:'column',alignItems:'center', marginLeft:'-30px'}}>
                     <Typography className="scroll-hint">
-                      Scroll down to learn more
+                    Need help? Scroll down for details and support email
                     </Typography>
-                    <Typography className="scroll-arrow" onClick={scrollToNextSection}>
+                    <Typography className="scroll-arrow" onClick={scrollToNextSection} sx={{marginTop:'-10px'}}>
                       ↓
                     </Typography>
                   </Box>
@@ -231,6 +232,6 @@ export default function KnowMore({dynamicNavigation,user}) {
       <Box id="choose-us">
         <ChooseUs dynamicNavigation={dynamicNavigation} user={user}/>
       </Box>
-    </>
+    </Box>
   );
 }

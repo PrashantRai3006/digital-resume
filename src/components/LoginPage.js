@@ -36,22 +36,22 @@ const LoginPage = ({ dynamicNavigation }) => {
       dynamicNavigation("/form");
     } catch (err) {
       const rawMessage = err.message
-      .replace(/auth\//g, "") // Remove "auth/"
-      .replace(/Firebase\s*:\s*/i, "") // Remove "Firebase: " if present
-      .replace(/\bError\b/i, "") // Remove standalone "Error"
-      .replace(/[\(\).:]/g, "") // Remove parentheses, dots, colons
-      .replace(/-/g, " ") // Replace hyphens with spaces
-      .trim();
-    
-    // Capitalize each word properly
-    const formattedMessage = rawMessage
-      .split(/\s+/) // Ensure proper word splitting
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
-      .join(" "); // Convert array back to string
-    
-    setError(`Error - ${formattedMessage}`);
-    
+        .replace(/auth\//g, "") // Remove "auth/"
+        .replace(/Firebase\s*:\s*/i, "") // Remove "Firebase: " if present
+        .replace(/\bError\b/i, "") // Remove standalone "Error"
+        .replace(/[\(\).:]/g, "") // Remove parentheses, dots, colons
+        .replace(/-/g, " ") // Replace hyphens with spaces
+        .trim();
 
+      // Capitalize each word properly
+      const formattedMessage = rawMessage
+        .split(/\s+/) // Ensure proper word splitting
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ) // Capitalize each word
+        .join(" "); // Convert array back to string
+
+      setError(`Error - ${formattedMessage}`);
 
       setShowError(true);
       setTimeout(() => setShowError(false), 4000);
@@ -71,8 +71,23 @@ const LoginPage = ({ dynamicNavigation }) => {
   };
 
   return (
+    <>
+    <style>
+        {`
+        /* Ensure no horizontal scrollbar */
+        html, body {
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
+          width: 100vw;
+        }
+        `}
+      </style>
+    
     <Box
       sx={{
+        width:'100vw',
+        boxSizing: "border-box",
         height: "100vh",
         display: "flex",
         flexDirection: "column",
@@ -90,7 +105,7 @@ const LoginPage = ({ dynamicNavigation }) => {
       <Grow in={showError}>
         <Alert
           severity="error"
-          icon={<ErrorOutline fontSize="large" />} 
+          icon={<ErrorOutline fontSize="large" />}
           sx={{
             position: "absolute",
             top: 20,
@@ -110,7 +125,7 @@ const LoginPage = ({ dynamicNavigation }) => {
             backdropFilter: "blur(10px)",
           }}
         >
-           {error}
+          {error}
         </Alert>
       </Grow>
       <Typography variant="h4" fontWeight="bold" mb={3}>
@@ -157,7 +172,12 @@ const LoginPage = ({ dynamicNavigation }) => {
           color="primary"
           fullWidth
           onClick={handleAuth}
-          sx={{ borderRadius: "20px", padding: "12px 30px", mb: 2, fontSize: "16px" }}
+          sx={{
+            borderRadius: "20px",
+            padding: "12px 30px",
+            mb: 2,
+            fontSize: "16px",
+          }}
         >
           {isSignup ? "Sign Up" : "Login"}
         </Button>
@@ -166,19 +186,51 @@ const LoginPage = ({ dynamicNavigation }) => {
           color="secondary"
           fullWidth
           onClick={handleGoogleLogin}
-          sx={{ borderRadius: "20px", padding: "12px 30px", mb: 2, fontSize: "16px" }}
+          sx={{
+            borderRadius: "20px",
+            padding: "12px 30px",
+            mb: 2,
+            fontSize: "16px",
+          }}
         >
           Sign in with Google
         </Button>
         <Typography
           variant="body2"
-          sx={{ mt: 2, cursor: "pointer", textDecoration: "underline", color: "#1e3c72" }}
+          sx={{
+            mt: 2,
+            cursor: "pointer",
+            textDecoration: "underline",
+            color: "#1e3c72",
+          }}
           onClick={() => setIsSignup(!isSignup)}
         >
           {isSignup ? "Already have an account? Login" : "New user? Sign up"}
         </Typography>
       </Box>
+      <Box
+        sx={{
+          textAlign: "center",
+          backgroundColor: "#001f3f",
+          py: 3,
+          color: "white",
+          width: "100vw",
+          position: "absolute",
+          bottom: "0px",
+        }}
+      >
+        <Typography variant="body2">
+          Need help?{" "}
+          <a
+            href="mailto:support@digitalresumebuilder.com"
+            style={{ color: "#00BFFF" }}
+          >
+            Contact Support (support@digitalresumebuilder.com)
+          </a>
+        </Typography>
+      </Box>
     </Box>
+    </>
   );
 };
 

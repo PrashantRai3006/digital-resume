@@ -35,6 +35,17 @@ const HomePage = ({ dynamicNavigation }) => {
 
   return (
     <>
+    <style>
+        {`
+        /* Ensure no horizontal scrollbar */
+        html, body {
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
+          width: 100vw;
+        }
+        `}
+      </style>
       <Box
         sx={{
           height: "100vh",
@@ -46,6 +57,8 @@ const HomePage = ({ dynamicNavigation }) => {
           overflow: "hidden",
           color: "white",
           textAlign: "center",
+          overflowX: "hidden",
+          width:'100vw'
         }}
       >
         {/* Background Animation */}
@@ -134,7 +147,7 @@ const HomePage = ({ dynamicNavigation }) => {
         </style>
 
         {/* Slow Moving Circular Stars */}
-        <div className="stars">
+        <div className="stars" >
           {[...Array(100)].map((_, i) => (
             <div
               key={i}
@@ -194,11 +207,11 @@ const HomePage = ({ dynamicNavigation }) => {
             Create Your Resume Now 🚀
           </Button>
         </motion.div>
-        <Box sx={{ position: "absolute", bottom: "30px" }}>
+        <Box sx={{ position: "absolute", bottom: "40px" }}>
           <Typography className="scroll-hint">
-            Scroll down to learn more
+          Need help? Scroll down for details and support email
           </Typography>
-          <Typography className="scroll-arrow" onClick={scrollToNextSection}>
+          <Typography className="scroll-arrow" onClick={scrollToNextSection} sx={{marginTop:'-10px'}}>
             ↓
           </Typography>
         </Box>
