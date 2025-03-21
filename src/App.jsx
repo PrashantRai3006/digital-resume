@@ -11,7 +11,7 @@ import { auth } from "./components/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import CashfreePayment from "./components/Cashfreepayment";
 import ResumePreview from "./components/ResumePreview";
-
+import "./index.css"
 const App = () => {
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("formData");

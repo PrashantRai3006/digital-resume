@@ -4,6 +4,7 @@ import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import KnowMore from "./KnowMore";
 import { motion } from "framer-motion"; // Animation Library
+
 const HomePage = ({ dynamicNavigation }) => {
   const [user, setUser] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -35,17 +36,7 @@ const HomePage = ({ dynamicNavigation }) => {
 
   return (
     <>
-    <style>
-        {`
-        /* Ensure no horizontal scrollbar */
-        html, body {
-          margin: 0;
-          padding: 0;
-          overflow-x: hidden;
-          width: 100vw;
-        }
-        `}
-      </style>
+    
       <Box
         sx={{
           height: "100vh",
