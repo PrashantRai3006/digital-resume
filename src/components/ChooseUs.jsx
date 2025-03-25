@@ -121,11 +121,11 @@ export default function ChooseUs({dynamicNavigation,user}) {
         </Button>
       </motion.div>
 
-      <Typography variant="body2" sx={{ mt: 5, opacity: 0.8, maxWidth: 600 }}>
+      <Typography variant="body2" sx={{ mt: 4, opacity: 0.8, maxWidth: 600 }}>
         This is just the beginning! 🚀 More resume templates and AI-powered improvements will be added based on user feedback.
       </Typography>
       {/* Footer with Support Email */}
-      <Box sx={{ textAlign: "center", backgroundColor: "#001f3f", py:3,color: "white", width:'100%', position:'absolute', bottom:'0px'}}>
+      <Box sx={{ textAlign: "center", backgroundColor: "#001f3f", py:2,color: "white", width:'100%', position:'absolute', bottom:'0px'}}>
       <Typography variant="body2">
           Need help? <a href="mailto:support@digitalresumebuilder.com" style={{ color: "#00BFFF" }}>Contact Support (support@digitalresumebuilder.com)</a>
         </Typography>
