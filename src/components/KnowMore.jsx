@@ -135,7 +135,7 @@ export default function KnowMore({dynamicNavigation,user}) {
                   </Typography>
                   <Typography
                     variant="h4"
-                    sx={{ fontWeight: "bold", marginBottom: "16px" }}
+                    sx={{ fontWeight: "bold", marginBottom: "24px" }}
                   >
                     ↓
                   </Typography>
@@ -220,9 +220,6 @@ export default function KnowMore({dynamicNavigation,user}) {
           }}
         >
           <Box sx={{ position: "absolute", bottom: "0px" , display:'flex',flexDirection:'column',alignItems:'center', marginLeft:'-30px'}}>
-                    <Typography className="scroll-hint">
-                    Need help? Scroll down for details and support email
-                    </Typography>
                     <Typography className="scroll-arrow" onClick={scrollToNextSection} sx={{marginTop:'-10px'}}>
                       ↓
                     </Typography>

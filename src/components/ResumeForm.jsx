@@ -8,6 +8,7 @@ import {
   IconButton,
   Checkbox,
   FormControlLabel,
+  Menu, MenuItem 
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DeleteForever } from "@mui/icons-material";
@@ -16,8 +17,8 @@ import { use } from "react";
 import { useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase"; // Ensure correct import path
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
-
 const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
   const [skills, setSkills] = useState(formData.skills || []);
   const [experience, setExperience] = useState(formData.experience || []);
@@ -48,6 +49,15 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
   const [personalDetails, setPersonalDetails] = useState(
     formData.personalDetails || ""
   );
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
   const handleAddEducation = () => {
     if (
       newEducation.school.trim() &&
@@ -227,45 +237,60 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
       }}
     >
       <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        padding: "20px 0px",
+        position: "relative",
+        marginBottom:'60px',
+        marginTop:'20px'
+      }}
+    >
+      <Typography
+        variant="h4"
         sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "20px 0px",
-          position: "relative",
+          textAlign: "center",
+          color: "#3f51b5",
+          fontWeight: "bold",
+          fontFamily: "Poppins, sans-serif", // ✅ Poppins font applied
+          position: "absolute",
+          left: "50%",
+          transform: "translateX(-50%)",
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            textAlign: "center",
-            color: "#3f51b5",
-            fontWeight: "bold",
-            position: "absolute",
-            left: "50%",
-            transform: "translateX(-50%)",
-          }}
-        >
-          Create Your Professional Resume
-        </Typography>
-        <Button
-          variant="contained"
-          color="error"
+        Create Your Professional Resume
+      </Typography>
+
+      {/* User Icon with Menu */}
+      <IconButton
+        onClick={handleMenuOpen}
+        sx={{
+          position:'absolute',
+          right:'0px',
+          backgroundColor: "#3f51b5",
+          color: "white",
+          "&:hover": { backgroundColor: "#1e88e5" },
+          padding: "8px",
+          borderRadius: "50%",
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+        }}
+      >
+        <AccountCircleIcon sx={{ fontSize: 36 }} />
+      </IconButton>
+
+      {/* Dropdown Menu */}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+        <MenuItem
           onClick={handleLogout}
-          startIcon={<LogoutIcon />}
           sx={{
-            borderRadius: "8px",
-            padding: "10px 24px",
             fontWeight: "bold",
-            backgroundColor: "#d32f2f",
-            "&:hover": { backgroundColor: "#b71c1c" },
-            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-            marginLeft: "auto",
+            color: "#d32f2f",
           }}
         >
-          Log Out
-        </Button>
-      </Box>
+          <LogoutIcon sx={{ marginRight: "8px" }} /> Logout
+        </MenuItem>
+      </Menu>
+    </Box>
 
       {/* Basic Information */}
       <Grid container spacing={2}>

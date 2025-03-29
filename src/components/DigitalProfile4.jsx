@@ -29,7 +29,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
     personalDetails,
   } = formData;
   const resumeRef = useRef();
-  const [image, setImage] = useState("/static/images/avatar/1.jpg");
+  const [image, setImage] = useState("");
   useEffect(() => {
     adjustHeight(); // Adjust height when component mounts or updates
   }, []);
@@ -185,7 +185,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
             <Box pb={5}>
               <Avatar
                 alt="User Avatar"
-                src={image} // ✅ Uses state to update image
+                src={image || "/fallback-image.png"} // ✅ Uses state to update image
                 sx={{ width: 108, height: 108, cursor: "pointer" }} // ✅ Ensures it's clickable
                 onClick={handleAvatarClick}
               />

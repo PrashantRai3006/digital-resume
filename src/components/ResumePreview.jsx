@@ -61,18 +61,18 @@ const ResumePreview = () => {
       {/* Resume Preview */}
       <Box
         sx={{
-          width: "70%",
-          height: "80%",
+          width: "75%",
+          height: "100%",
           borderRadius: "8px",
           border: "2px solid #ccc",
           overflow: "hidden",
           position: "relative",
           filter: paid ? "none" : "blur(5px)",
-          opacity: paid ? 1 : 0.6,
+          opacity: paid ? 1 : 0.8,
           transition: "all 0.3s ease-in-out",
         }}
       >
-        <img src={ResumePreviewImg} alt="Resume Preview" style={{ width: "100%", height: "150%", objectFit: "cover" }} />
+        <img src={ResumePreviewImg} alt="Resume Preview"  />
       </Box>
 
       {/* Payment Button (only if not paid) */}

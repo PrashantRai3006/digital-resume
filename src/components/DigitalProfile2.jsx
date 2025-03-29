@@ -29,7 +29,7 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
     personalDetails,
   } = formData;
   const resumeRef = useRef();
-  const [image, setImage] = useState("/static/images/avatar/1.jpg");
+  const [image, setImage] = useState("");
   const handleDownload = async () => {
       const pdf = new jsPDF("p", "px", "a4");
   
@@ -247,8 +247,8 @@ const DigitalProfile2 = ({ formData, dynamicNavigation, handleSubmit }) => {
             <Box pb={5}>
               <Avatar
                 alt="User Avatar"
-                src={image} // ✅ Uses state to update image
-                sx={{ width: 108, height: 108, cursor: "pointer" }} // ✅ Ensures it's clickable
+                src={image || "/fallback-image.png"} // ✅ Uses state to update image
+                sx={{ width: 108, height: 108, cursor: "pointer" , zIndex:2}} // ✅ Ensures it's clickable
                 onClick={handleAvatarClick}
               />
               <input
