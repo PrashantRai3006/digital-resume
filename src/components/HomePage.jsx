@@ -171,7 +171,7 @@ const HomePage = ({ dynamicNavigation }) => {
         >
           <Button
             variant="contained"
-            onClick={() => dynamicNavigation(user ? "/form" : "/login")}
+            onClick={() => dynamicNavigation(user ? "/file-upload" : "/login")}
             sx={{
               mt: 5,
               borderRadius: "50px",

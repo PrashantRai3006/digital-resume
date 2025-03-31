@@ -62,7 +62,7 @@ const LoginPage = ({ dynamicNavigation }) => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      dynamicNavigation("/form");
+      dynamicNavigation("/file-upload");
     } catch (err) {
       setError(err.message);
       setShowError(true);

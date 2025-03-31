@@ -12,38 +12,45 @@ const ProtectedRoute = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        setUser(null);
+        setIsPaid(false);
+        setLoading(false);
+        return;
+      }
+
       setUser(currentUser);
-      setLoading(false);
+      
+      try {
+        const userRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userRef);
 
-      if (currentUser) {
-        try {
-          const userRef = doc(db, "users", currentUser.uid);
-          const userSnap = await getDoc(userRef);
-
-          if (userSnap.exists()) {
-            const paymentStatus = userSnap.data().paymentStatus;
-            setIsPaid(paymentStatus === "success");
-          } else {
-            setIsPaid(false);
-          }
-        } catch (error) {
-          console.error("Error fetching payment status:", error);
+        if (userSnap.exists()) {
+          setIsPaid(userSnap.data().paymentStatus === "success");
+        } else {
           setIsPaid(false);
         }
+      } catch (error) {
+        console.error("Error fetching payment status:", error);
+        setIsPaid(false);
+      } finally {
+        setLoading(false);
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  if (loading || isPaid === null) return <div>Loading...</div>;
-
-  if (!user) return <Navigate to="/login" replace />;
+  // Redirect immediately if no user
+  if (!loading && !user) return <Navigate to="/login" replace />;
 
   // Redirect non-paid users trying to access "/digital-resume/:id"
-  if (!isPaid && location.pathname.startsWith("/digital-resume")) {
+  if (!loading && !isPaid && location.pathname.startsWith("/digital-resume")) {
     return <Navigate to="/resume-preview" replace />;
   }
+
+  // Show loading only if it's genuinely still fetching
+  if (loading) return <div>Loading...</div>;
 
   return <Outlet />;
 };

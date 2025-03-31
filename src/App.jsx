@@ -12,6 +12,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import CashfreePayment from "./components/Cashfreepayment";
 import ResumePreview from "./components/ResumePreview";
 import "./index.css"
+import ResumeUploader from "./components/ResumeUploader";
 const App = () => {
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("formData");
@@ -37,7 +38,6 @@ const App = () => {
 
     return () => unsubscribe();
   }, []);
-
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -48,6 +48,7 @@ const App = () => {
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
+        <Route path="/file-upload" element={<ResumeUploader setFormData={setFormData} dynamicNavigation={navigateTo}/>} />
           <Route path="/form" element={<ResumeForm setFormData={setFormData} formData={formData} dynamicNavigation={navigateTo} />} />
           <Route path="/digital-resume/:id" element={<TemplateRender formData={formData} dynamicNavigation={navigateTo} />} />
           <Route path="/thank-you" element={<ThankYouPage dynamicNavigation={navigateTo} formData={formData} />} />
