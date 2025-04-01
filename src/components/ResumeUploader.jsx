@@ -124,14 +124,21 @@ const ResumeUploader = ({ setFormData, dynamicNavigation }) => {
     const messages = [
       {
         role: "system",
-        content:
-          "You are a highly skilled resume parser. Extract and structure the resume data into a JSON object and enhance content to make crispy and professional add bullets where require.",
+        content: `You are a highly skilled resume parser. 
+        STRICT RULES:
+        - DO NOT assume missing personal data (email, phone number, etc.).
+        - If an email or phone number is missing, return **"Information not available"** instead of making one up.
+        - Extract details **ONLY from the provided text**, never invent information.
+        - If any field is missing, do not generate fake details; return **"Information not available"** instead.
+        - Experience responsibility should have minimum 5 bullet points for all experience if require generate dynamically`
       },
       {
         role: "user",
-        content: `Please enhance and professionalize the extracted content. Make it world-class, concise, and polished, suitable for a high-level job application. Ensure that all details are presented in a professional tone, reflecting key skills and achievements in the output format below.
+  content: `Please enhance and professionalize the extracted content. Ensure a high-level job application structure while maintaining accuracy. 
+  - **Do not generate or infer missing personal data** (phone number, email, etc.). If they are missing from the extracted data, set them as an **empty string ('')**.
+  - Strictly follow the format below:
   
-  please note strictly follow below format and convert IT Skill using below format tool used, programming langauage
+  please note strictly follow below format and replace extracted data with placeholder else put Information not available and convert IT Skill using below format tool used, programming langauage
   Output format:
   {
       "name": "John Doe",
@@ -154,7 +161,7 @@ const ResumeUploader = ({ setFormData, dynamicNavigation }) => {
       • #Technical Language#: Mainframe, Core Java\n
       • #Programming Language#: COBOL\n
       • #Tools Used#: VSAM",
-      "personalDetails": "• #Date of Birth#: 1st January 1995\n
+      "personalDetails": "• #Date of Birth#: 1st January 1998\n
       • #Languages Known#: English & Hindi\n
       • #Address#: 123 Fake Street, Sample City, Country",
       "skills": [
@@ -216,7 +223,8 @@ const ResumeUploader = ({ setFormData, dynamicNavigation }) => {
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
           messages: messages,
-          max_tokens: 1500
+          max_tokens: 3000,
+          temperature: 0
         })
       });
   
@@ -230,7 +238,7 @@ const ResumeUploader = ({ setFormData, dynamicNavigation }) => {
         const updatedResumeFields = {
           name: parsedData.name || "Information not provided",
           email: parsedData.email || "Information not provided",
-          number: parsedData.number || "Information not provided",
+          number: "",
           summary: parsedData.summary || "Information not provided",
           educationDetails: parsedData.educationDetails || "Information not provided",
           certification: parsedData.certification || "Information not provided",
