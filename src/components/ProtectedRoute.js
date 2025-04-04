@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-
+import ResumeLoader from "./ResumeLoader";
 const ProtectedRoute = () => {
   const [user, setUser] = useState(null);
   const [isPaid, setIsPaid] = useState(null);
@@ -50,7 +50,7 @@ const ProtectedRoute = () => {
   }
 
   // Show loading only if it's genuinely still fetching
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ResumeLoader/>
 
   return <Outlet />;
 };

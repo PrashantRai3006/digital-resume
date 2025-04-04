@@ -285,7 +285,7 @@ const ResumeUploader = ({ setFormData, dynamicNavigation }) => {
       >
         <Box
           sx={{
-            width: 400,
+            width: 380, // Slightly wider for a balanced look
             backgroundColor: "white",
             padding: 4,
             borderRadius: "16px",
@@ -293,64 +293,63 @@ const ResumeUploader = ({ setFormData, dynamicNavigation }) => {
             textAlign: "center",
           }}
         >
+          {/* Disclaimer */}
+          <Alert severity="info" sx={{ mb: 2, textAlign: "left" }}>
+            <Typography variant="body2">
+              If you choose to upload a file, it will be processed using OpenAI’s technology to extract key details.
+            </Typography>
+          </Alert>
+  
           <Typography variant="h5" fontWeight="bold" mb={2} color="primary">
             Upload Your Resume
           </Typography>
-          <label htmlFor="resume-upload">
-            <input
-              type="file"
-              accept=".pdf, .docx"
-              id="resume-upload"
-              style={{ display: "none" }}
-              //onClick={()=>setError("")}
-              onChange={handleFileUpload}
-            />
-            <Button
-              component="span"
-              variant="contained"
-              color="primary"
-              startIcon={<CloudUploadIcon />}
-              sx={{
-                borderRadius: "20px",
-                padding: "12px 30px",
-                fontSize: "16px",
-                transition: "all 0.3s",
-                ":hover": { transform: "scale(1.05)" },
-              }}
-            >
-              Choose File
-            </Button>
-          </label>
-          {loading && (
-            <Typography color="blue" mt={2}>
-              <CircularProgress size={20} /> Processing file...
-            </Typography>
-          )}
-          {error && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {error} <br /> 
-            </Alert>
-          )}
-          {resumeData && Object.keys(resumeData).length > 0 && (
-            <Box
-              sx={{
-                marginTop: 2,
-                textAlign: "left",
-                backgroundColor: "#f9f9f9",
-                padding: 2,
-                borderRadius: 1,
-                overflowX: "auto",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
-            >
-              <Typography variant="h6" color="secondary" gutterBottom>
-                Extracted Resume Data:
-              </Typography>
-              <pre>{JSON.stringify(resumeData, null, 2)}</pre>
+  
+          {/* Error or Processing Message */}
+          {(loading || error) && (
+            <Box mt={2}>
+              {loading && (
+                <Typography color="blue">
+                  <CircularProgress size={20} /> Processing file...
+                </Typography>
+              )}
+              {error && (
+                <Alert severity="error" sx={{ mt: 1 }}>
+                  {error}
+                </Alert>
+              )}
             </Box>
           )}
-          <Box mt={3} display="flex" justifyContent="center">
+  
+          {/* Buttons in Different Lines */}
+          <Box mt={3}>
+            <label htmlFor="resume-upload">
+              <input
+                type="file"
+                accept=".pdf, .docx"
+                id="resume-upload"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+              />
+              <Button
+                component="span"
+                variant="contained"
+                color="primary"
+                fullWidth
+                startIcon={<CloudUploadIcon />}
+                sx={{
+                  borderRadius: "20px",
+                  padding: "12px 0",
+                  fontSize: "16px",
+                  transition: "all 0.3s",
+                  ":hover": { transform: "scale(1.05)" },
+                }}
+              >
+                Choose File
+              </Button>
+            </label>
+          </Box>
+  
+          <Box mt={2}>
             <Button
               variant="contained"
               color="secondary"
@@ -363,7 +362,7 @@ const ResumeUploader = ({ setFormData, dynamicNavigation }) => {
                 backgroundColor: "white",
                 color: "#1e3c72",
                 border: "1px solid #1e3c72",
-                padding: "12px 30px",
+                padding: "12px 0",
                 fontSize: "16px",
                 transition: "all 0.3s",
                 ":hover": {
@@ -380,6 +379,8 @@ const ResumeUploader = ({ setFormData, dynamicNavigation }) => {
       </motion.div>
     </Box>
   );
+  
+  
 };
 
 export default ResumeUploader;

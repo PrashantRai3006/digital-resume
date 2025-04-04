@@ -8,17 +8,20 @@ import {
   IconButton,
   Checkbox,
   FormControlLabel,
-  Menu, MenuItem 
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DeleteForever } from "@mui/icons-material";
 import dayjs from "dayjs"; // Ensure you have dayjs installed
-import { use } from "react";
 import { useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase"; // Ensure correct import path
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import {enhanceWithAI} from "./AIEnhancer"
+
 const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
   const [skills, setSkills] = useState(formData.skills || []);
   const [experience, setExperience] = useState(formData.experience || []);
@@ -32,6 +35,8 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
   const [workIds, setWorkIds] = useState(formData.workIds || []);
   const [softSkills, setSoftSkills] = useState(formData.softSkills || []);
   const [newSoftSkill, setNewSoftSkill] = useState("");
+  const [loader,setLoader]=useState(false)
+
   const [newEducation, setNewEducation] = useState({
     school: "",
     startYear: "",
@@ -169,7 +174,22 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
     };
     setExperience(updatedExperience);
   };
-
+  const enhanceText = async (category, text, index) => {
+    setLoader(true)
+    const updatedText = await enhanceWithAI(text, category);
+    if (category === "summary") {
+      setSummary(updatedText);
+    } else {
+      const updatedExperience = [...experience];
+      updatedExperience[index] = {
+        ...updatedExperience[index],
+        [category]: updatedText,
+      };
+      setExperience(updatedExperience);
+    }
+    setLoader(false)
+  };
+  
   const handleCreateResume = () => {
     const resumeData = {
       name,
@@ -237,60 +257,64 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
       }}
     >
       <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        padding: "20px 0px",
-        position: "relative",
-        marginBottom:'60px',
-        marginTop:'20px'
-      }}
-    >
-      <Typography
-        variant="h4"
         sx={{
-          textAlign: "center",
-          color: "#3f51b5",
-          fontWeight: "bold",
-          fontFamily: "Poppins, sans-serif", // ✅ Poppins font applied
-          position: "absolute",
-          left: "50%",
-          transform: "translateX(-50%)",
+          display: "flex",
+          alignItems: "center",
+          padding: "20px 0px",
+          position: "relative",
+          marginBottom: "60px",
+          marginTop: "20px",
         }}
       >
-        Create Your Professional Resume
-      </Typography>
-
-      {/* User Icon with Menu */}
-      <IconButton
-        onClick={handleMenuOpen}
-        sx={{
-          position:'absolute',
-          right:'0px',
-          backgroundColor: "#3f51b5",
-          color: "white",
-          "&:hover": { backgroundColor: "#1e88e5" },
-          padding: "8px",
-          borderRadius: "50%",
-          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-        }}
-      >
-        <AccountCircleIcon sx={{ fontSize: 36 }} />
-      </IconButton>
-
-      {/* Dropdown Menu */}
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem
-          onClick={handleLogout}
+        <Typography
+          variant="h4"
           sx={{
+            textAlign: "center",
+            color: "#3f51b5",
             fontWeight: "bold",
-            color: "#d32f2f",
+            fontFamily: "Poppins, sans-serif", // ✅ Poppins font applied
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
           }}
         >
-          <LogoutIcon sx={{ marginRight: "8px" }} /> Logout
-        </MenuItem>
-      </Menu>
-    </Box>
+          Create Your Professional Resume
+        </Typography>
+
+        {/* User Icon with Menu */}
+        <IconButton
+          onClick={handleMenuOpen}
+          sx={{
+            position: "absolute",
+            right: "0px",
+            backgroundColor: "#3f51b5",
+            color: "white",
+            "&:hover": { backgroundColor: "#1e88e5" },
+            padding: "8px",
+            borderRadius: "50%",
+            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+          }}
+        >
+          <AccountCircleIcon sx={{ fontSize: 36 }} />
+        </IconButton>
+
+        {/* Dropdown Menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem
+            onClick={handleLogout}
+            sx={{
+              fontWeight: "bold",
+              color: "#d32f2f",
+            }}
+          >
+            <LogoutIcon sx={{ marginRight: "8px" }} /> Logout
+          </MenuItem>
+        </Menu>
+      </Box>
 
       {/* Basic Information */}
       <Grid container spacing={2}>
@@ -353,7 +377,6 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
                     <Grid item xs={5.5}>
                       <TextField
                         fullWidth
-                        
                         required
                         value={work.label}
                         onChange={(e) =>
@@ -365,7 +388,6 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
                     </Grid>
                     <Grid item xs={5.5}>
                       <TextField
-                      
                         required
                         value={work.link}
                         onChange={(e) =>
@@ -441,216 +463,269 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
           >
             Profile Summary
           </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            placeholder="Enter a brief summary about yourself"
-            sx={{
-              background: "white",
-              borderRadius: "8px",
-            }}
-          />
+          <Box sx={{ position: "relative", width: "100%" }}>
+            <TextField
+              fullWidth
+              multiline
+              disabled={loader}
+              rows={4}
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+              placeholder="Enter a brief summary about yourself"
+              sx={{
+                background: "white",
+                borderRadius: "8px",
+                paddingRight: "50px", // Space for the button
+              }}
+            />
+            <IconButton
+              onClick={()=>enhanceText("summary",summary)}
+              sx={{
+                position: "absolute",
+                top: "0px",
+                right: "0px",
+                padding: 0,
+                width: "36px",
+                height: "36px",
+                color: "#6c757d", // subtle grey
+                ":hover": {
+                  color: "#2a5298", // hover effect with primary accent
+                  background: "transparent", // no bg even on hover
+                },
+              }}
+            >
+              <AutoAwesomeIcon fontSize="small" />
+            </IconButton>
+          </Box>
         </Grid>
         {/* Education Details */}
         <Grid item xs={12}>
-  <Typography variant="h5" sx={{ color: "#3f51b5", marginBottom: "16px" }}>
-    Education Details
-  </Typography>
-  <Grid container spacing={2}>
-    {/* Display Added Education Entries */}
-    {Boolean(educationDetails.length) && (
-      <Grid item xs={12}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {educationDetails.map((edu, index) => (
-            <Grid
-              container
-              key={index}
-              spacing={2}
-              sx={{
-                alignItems: "center",
-                backgroundColor: "aliceblue",
-                
-                borderRadius: "12px",
-              }}
-            >
-              <Grid item xs={3.6}>
-                <TextField
-                  fullWidth
-                  required
-                  value={edu.school}
-                  onChange={(e) =>
-                    handleEducationChange(index, "school", e.target.value)
-                  }
-                  placeholder="Enter College/School"
-                  sx={{ background: "white", borderRadius: "8px" }}
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <TextField
-                  fullWidth
-                  required
-                  value={edu.degree}
-                  onChange={(e) =>
-                    handleEducationChange(index, "degree", e.target.value)
-                  }
-                  placeholder="Degree"
-                  sx={{ background: "white", borderRadius: "8px" }}
-                />
-              </Grid>
-              <Grid item xs={1.8}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  required
-                  value={edu.startYear}
-                  onChange={(e) =>
-                    handleEducationChange(index, "startYear", e.target.value)
-                  }
-                  placeholder="YYYY"
-                  sx={{ background: "white", borderRadius: "8px" }}
-                />
-              </Grid>
-              <Grid item xs={1.8}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  required
-                  value={edu.endYear}
-                  onChange={(e) =>
-                    handleEducationChange(index, "endYear", e.target.value)
-                  }
-                  placeholder="YYYY"
-                  sx={{ background: "white", borderRadius: "8px" }}
-                />
-              </Grid>
-              <Grid item xs={1.8}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  required
-                  value={edu.percentage}
-                  onChange={(e) =>
-                    handleEducationChange(index, "percentage", e.target.value)
-                  }
-                  placeholder="%"
-                  sx={{ background: "white", borderRadius: "8px" }}
-                />
-              </Grid>
-              <Grid item xs={1}>
-                <IconButton
-                  size="small"
-                  onClick={() => handleRemoveEducation(index)}
-                  color="error"
+          <Typography
+            variant="h5"
+            sx={{ color: "#3f51b5", marginBottom: "16px" }}
+          >
+            Education Details
+          </Typography>
+          <Grid container spacing={2}>
+            {/* Display Added Education Entries */}
+            {Boolean(educationDetails.length) && (
+              <Grid item xs={12}>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: "10px" }}
                 >
-                  <DeleteForever />
-                </IconButton>
+                  {educationDetails.map((edu, index) => (
+                    <Grid
+                      container
+                      key={index}
+                      spacing={2}
+                      sx={{
+                        alignItems: "center",
+                        backgroundColor: "aliceblue",
+
+                        borderRadius: "12px",
+                      }}
+                    >
+                      <Grid item xs={3.6}>
+                        <TextField
+                          fullWidth
+                          required
+                          value={edu.school}
+                          onChange={(e) =>
+                            handleEducationChange(
+                              index,
+                              "school",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Enter College/School"
+                          sx={{ background: "white", borderRadius: "8px" }}
+                        />
+                      </Grid>
+                      <Grid item xs={2}>
+                        <TextField
+                          fullWidth
+                          required
+                          value={edu.degree}
+                          onChange={(e) =>
+                            handleEducationChange(
+                              index,
+                              "degree",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Degree"
+                          sx={{ background: "white", borderRadius: "8px" }}
+                        />
+                      </Grid>
+                      <Grid item xs={1.8}>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          required
+                          value={edu.startYear}
+                          onChange={(e) =>
+                            handleEducationChange(
+                              index,
+                              "startYear",
+                              e.target.value
+                            )
+                          }
+                          placeholder="YYYY"
+                          sx={{ background: "white", borderRadius: "8px" }}
+                        />
+                      </Grid>
+                      <Grid item xs={1.8}>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          required
+                          value={edu.endYear}
+                          onChange={(e) =>
+                            handleEducationChange(
+                              index,
+                              "endYear",
+                              e.target.value
+                            )
+                          }
+                          placeholder="YYYY"
+                          sx={{ background: "white", borderRadius: "8px" }}
+                        />
+                      </Grid>
+                      <Grid item xs={1.8}>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          required
+                          value={edu.percentage}
+                          onChange={(e) =>
+                            handleEducationChange(
+                              index,
+                              "percentage",
+                              e.target.value
+                            )
+                          }
+                          placeholder="%"
+                          sx={{ background: "white", borderRadius: "8px" }}
+                        />
+                      </Grid>
+                      <Grid item xs={1}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleRemoveEducation(index)}
+                          color="error"
+                        >
+                          <DeleteForever />
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                  ))}
+                </Box>
+              </Grid>
+            )}
+
+            {/* Input Fields for Adding a New Entry */}
+            <Grid item xs={12}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={3.6}>
+                  <TextField
+                    fullWidth
+                    label="College/School"
+                    required
+                    value={newEducation.school}
+                    onChange={(e) =>
+                      setNewEducation({
+                        ...newEducation,
+                        school: e.target.value,
+                      })
+                    }
+                    placeholder="Enter College/School"
+                    sx={{ background: "white", borderRadius: "8px" }}
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    fullWidth
+                    label="Degree"
+                    required
+                    value={newEducation.degree}
+                    onChange={(e) =>
+                      setNewEducation({
+                        ...newEducation,
+                        degree: e.target.value,
+                      })
+                    }
+                    placeholder="Degree"
+                    sx={{ background: "white", borderRadius: "8px" }}
+                  />
+                </Grid>
+                <Grid item xs={1.8}>
+                  <TextField
+                    fullWidth
+                    label="Start Year"
+                    type="number"
+                    required
+                    value={newEducation.startYear}
+                    onChange={(e) =>
+                      setNewEducation({
+                        ...newEducation,
+                        startYear: e.target.value,
+                      })
+                    }
+                    placeholder="YYYY"
+                    sx={{ background: "white", borderRadius: "8px" }}
+                  />
+                </Grid>
+                <Grid item xs={1.8}>
+                  <TextField
+                    fullWidth
+                    label="End Year"
+                    type="number"
+                    required
+                    value={newEducation.endYear}
+                    onChange={(e) =>
+                      setNewEducation({
+                        ...newEducation,
+                        endYear: e.target.value,
+                      })
+                    }
+                    placeholder="YYYY"
+                    sx={{ background: "white", borderRadius: "8px" }}
+                  />
+                </Grid>
+                <Grid item xs={1.8}>
+                  <TextField
+                    fullWidth
+                    label="Percentage"
+                    type="number"
+                    required
+                    value={newEducation.percentage}
+                    onChange={(e) =>
+                      setNewEducation({
+                        ...newEducation,
+                        percentage: e.target.value,
+                      })
+                    }
+                    placeholder="%"
+                    sx={{ background: "white", borderRadius: "8px" }}
+                  />
+                </Grid>
+                <Grid item xs={1}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAddEducation}
+                    sx={{
+                      borderRadius: "16px",
+                      height: "56px",
+                    }}
+                  >
+                    Add
+                  </Button>
+                </Grid>
               </Grid>
             </Grid>
-          ))}
-        </Box>
-      </Grid>
-    )}
-
-    {/* Input Fields for Adding a New Entry */}
-    <Grid item xs={12}>
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={3.6}>
-          <TextField
-            fullWidth
-            label="College/School"
-            required
-            value={newEducation.school}
-            onChange={(e) =>
-              setNewEducation({ ...newEducation, school: e.target.value })
-            }
-            placeholder="Enter College/School"
-            sx={{ background: "white", borderRadius: "8px" }}
-          />
+          </Grid>
         </Grid>
-        <Grid item xs={2}>
-          <TextField
-            fullWidth
-            label="Degree"
-            required
-            value={newEducation.degree}
-            onChange={(e) =>
-              setNewEducation({ ...newEducation, degree: e.target.value })
-            }
-            placeholder="Degree"
-            sx={{ background: "white", borderRadius: "8px" }}
-          />
-        </Grid>
-        <Grid item xs={1.8}>
-          <TextField
-            fullWidth
-            label="Start Year"
-            type="number"
-            required
-            value={newEducation.startYear}
-            onChange={(e) =>
-              setNewEducation({
-                ...newEducation,
-                startYear: e.target.value,
-              })
-            }
-            placeholder="YYYY"
-            sx={{ background: "white", borderRadius: "8px" }}
-          />
-        </Grid>
-        <Grid item xs={1.8}>
-          <TextField
-            fullWidth
-            label="End Year"
-            type="number"
-            required
-            value={newEducation.endYear}
-            onChange={(e) =>
-              setNewEducation({
-                ...newEducation,
-                endYear: e.target.value,
-              })
-            }
-            placeholder="YYYY"
-            sx={{ background: "white", borderRadius: "8px" }}
-          />
-        </Grid>
-        <Grid item xs={1.8}>
-          <TextField
-            fullWidth
-            label="Percentage"
-            type="number"
-            required
-            value={newEducation.percentage}
-            onChange={(e) =>
-              setNewEducation({
-                ...newEducation,
-                percentage: e.target.value,
-              })
-            }
-            placeholder="%"
-            sx={{ background: "white", borderRadius: "8px" }}
-          />
-        </Grid>
-        <Grid item xs={1}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddEducation}
-            sx={{
-              borderRadius: "16px",
-              height: "56px",
-            }}
-          >
-            Add
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>
-  </Grid>
-</Grid>
 
         {/* Certification */}
         <Grid item xs={12}>
@@ -898,16 +973,39 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Responsibilities"
-                multiline
-                rows={3}
-                value={exp.responsibilities}
-                name="responsibilities"
-                onChange={(e) => handleChangeExperience(e, index)}
-                sx={{ background: "white", borderRadius: "8px" }}
-              />
+              <Box sx={{ position: "relative", width: "100%" }}>
+                <TextField
+                  fullWidth
+                  label="Responsibilities"
+                  multiline
+                  rows={3}
+                  disabled={loader}
+                  value={exp.responsibilities}
+                  name="responsibilities"
+                  onChange={(e) => handleChangeExperience(e, index)}
+                  sx={{
+                    background: "white",
+                    borderRadius: "8px",
+                    paddingRight: "40px", // space for icon
+                  }}
+                />
+                <IconButton
+                  onClick={() => {enhanceText("responsibilities",exp.responsibilities, index)}} // Use your handler here
+                  sx={{
+                    position: "absolute",
+                    top: "4px",
+                    right: "4px",
+                    padding: 0,
+                    color: "#6c757d",
+                    ":hover": {
+                      color: "#2a5298",
+                      background: "transparent",
+                    },
+                  }}
+                >
+                  <AutoAwesomeIcon fontSize="small" />
+                </IconButton>
+              </Box>
             </Grid>
             <Grid item xs={3}>
               <DatePicker

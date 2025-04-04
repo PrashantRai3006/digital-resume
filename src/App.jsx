@@ -13,6 +13,7 @@ import CashfreePayment from "./components/Cashfreepayment";
 import ResumePreview from "./components/ResumePreview";
 import "./index.css"
 import ResumeUploader from "./components/ResumeUploader";
+import ResumeLoader from "./components/ResumeLoader";
 const App = () => {
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("formData");
@@ -38,7 +39,7 @@ const App = () => {
 
     return () => unsubscribe();
   }, []);
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ResumeLoader/>
 
   return (
     <ConditionalLayout>
