@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { load } from "@cashfreepayments/cashfree-js";
 import { doc, setDoc } from "firebase/firestore";
-import { db, auth } from "./firebase"; // Firestore instance
+import { db, auth } from "./firebase";
 import { Box, Button, Typography } from "@mui/material";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 const CashfreePayment = () => {
   const [loading, setLoading] = useState(false);
@@ -14,58 +14,56 @@ const CashfreePayment = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // ✅ Get Authenticated User Safely
+  // ✅ Get Authenticated User
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      }
+      if (user) setUser(user);
     });
 
     return () => unsubscribe();
   }, []);
 
-  // ✅ Initialize Cashfree SDK once
+  // ✅ Load Cashfree SDK in Production Mode
   useEffect(() => {
     const initializeSDK = async () => {
       try {
-        const cashfreeInstance = await load({ mode: "sandbox" }); // or "production"
+        const cashfreeInstance = await load({
+          mode: "production", // 👈 CHANGED from "sandbox" to "production"
+        });
         setCashfree(cashfreeInstance);
-        console.log("✅ Cashfree SDK Loaded");
+        console.log("✅ Cashfree SDK Loaded (PROD)");
       } catch (err) {
-        console.error("❌ Failed to Load Cashfree SDK:", err);
+        console.error("❌ Failed to load Cashfree SDK:", err);
       }
     };
 
     initializeSDK();
   }, []);
 
-  // ✅ Updates Firestore when payment status changes
+  // ✅ Update Firestore with payment status
   useEffect(() => {
     const updatePaymentStatus = async () => {
       if (!user || !paymentStatus) return;
-      console.log("🔄 Updating Payment Status in Firestore");
 
       const userRef = doc(db, "users", user.uid);
       try {
         await setDoc(
           userRef,
           {
-            paymentStatus: paymentStatus,
+            paymentStatus,
             paymentTimestamp: new Date(),
           },
           { merge: true }
         );
-        console.log("✅ Payment Status Updated in Firestore");
-      } catch (error) {
-        console.error("❌ Error updating payment status:", error);
+        console.log("✅ Payment status updated in Firestore");
+      } catch (err) {
+        console.error("❌ Firestore update failed:", err);
       }
     };
 
     updatePaymentStatus();
   }, [paymentStatus, user]);
 
-  // ✅ Handle Payment
   const handlePayment = async () => {
     setLoading(true);
     setPaymentStatus(null);
@@ -74,66 +72,54 @@ const CashfreePayment = () => {
       const orderID = `ORDER_${Date.now()}`;
       setOrderId(orderID);
 
-      const response = await fetch(`${process.env.REACT_APP_PAYMENT_URL}/create-order`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: orderID,
-          orderAmount: 100,
-          customerName: user?.displayName || "John Doe",
-          customerEmail: user?.email || "johndoe@example.com",
-          customerPhone: "9999999999",
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_PAYMENT_URL}/create-order`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: orderID,
+            orderAmount: 1,
+            customerName: user?.displayName || "John Doe",
+            customerEmail: user?.email || "johndoe@example.com",
+            customerPhone: "9999999999",
+          }),
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(`❌ Server Error: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
       const data = await response.json();
-      console.log("🔄 API Response:", data);
 
-      if (!data.payment_session_id) {
-        throw new Error("❌ Payment session ID not received");
-      }
+      if (!data.payment_session_id) throw new Error("No session ID");
 
       const sessionId = data.payment_session_id;
-      console.log("✅ Payment Session ID:", sessionId);
 
-      if (!cashfree) {
-        throw new Error("❌ Cashfree SDK not initialized");
-      }
+      if (!cashfree) throw new Error("SDK not initialized");
 
       await cashfree.checkout({
         paymentSessionId: sessionId,
         redirectTarget: "_modal",
       });
 
-      console.log("✅ Payment Initiated");
       pollPaymentStatus(orderID);
-
     } catch (err) {
-      console.error("❌ Payment Error:", err);
+      console.error("❌ Payment error:", err);
       setPaymentStatus("error");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Verify Payment & Polling
   const pollPaymentStatus = async (orderID) => {
     let attempts = 0;
-    const maxAttempts = 6; // Try for ~30 seconds
+    const maxAttempts = 6;
 
     while (attempts < maxAttempts) {
       try {
-        const response = await fetch(`${process.env.REACT_APP_PAYMENT_URL}/verify-payment/${orderID}`);
-        if (!response.ok) {
-          throw new Error(`❌ Server Error: ${response.status}`);
-        }
-
+        const response = await fetch(
+          `${process.env.REACT_APP_PAYMENT_URL}/verify-payment/${orderID}`
+        );
         const data = await response.json();
-        console.log("🔍 Payment Status Check:", data);
 
         if (data.status === "success") {
           setPaymentStatus("success");
@@ -143,20 +129,22 @@ const CashfreePayment = () => {
           setPaymentStatus("failed");
           return;
         }
-
-      } catch (error) {
-        console.error("❌ Error checking payment:", error);
+      } catch (err) {
+        console.error("❌ Polling error:", err);
         setPaymentStatus("error");
       }
 
       attempts++;
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await new Promise((res) => setTimeout(res, 5000));
     }
   };
 
   return (
     <>
-        {loading ? "Processing..." : <>
+      {loading ? (
+        "Processing..."
+      ) : (
+        <>
           <Typography variant="h5" color="white" fontWeight="bold" mb={2}>
             Unlock Your Resume
           </Typography>
@@ -169,11 +157,12 @@ const CashfreePayment = () => {
           >
             Proceed to Payment
           </Button>
-        </>}
+        </>
+      )}
 
       {paymentStatus === "success" && (
         <div style={{ color: "green", marginTop: "20px" }}>
-          ✅ Payment Successful! Thank you for your purchase.
+          ✅ Payment Successful! Thank you.
         </div>
       )}
 
@@ -185,7 +174,7 @@ const CashfreePayment = () => {
 
       {paymentStatus === "pending" && (
         <div style={{ color: "orange", marginTop: "20px" }}>
-          ⏳ Payment is pending. Please wait for confirmation.
+          ⏳ Payment Pending. Please wait.
         </div>
       )}
 

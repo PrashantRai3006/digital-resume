@@ -238,7 +238,7 @@ const ResumeUploader = ({ setFormData, dynamicNavigation }) => {
         const updatedResumeFields = {
           name: parsedData.name || "Information not provided",
           email: parsedData.email || "Information not provided",
-          number: "",
+          number: "+91 ",
           summary: parsedData.summary || "Information not provided",
           educationDetails: parsedData.educationDetails || "Information not provided",
           certification: parsedData.certification || "Information not provided",
