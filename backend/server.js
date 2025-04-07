@@ -71,33 +71,36 @@ app.get("/verify-payment/:orderId", async (req, res) => {
 
     console.log("✅ Payment Status Response:", response.data);
 
-    // ✅ Fix: Use payments[0] from response
-    const paymentData = response.data.payments?.[0];
+    const paymentList = response.data.payments;
 
-    if (paymentData) {
-      const paymentStatus = paymentData.payment_status;
+    if (!paymentList || paymentList.length === 0) {
+      return res.json({
+        status: "pending",
+        message: "No payments yet for this order",
+      });
+    }
 
-      if (paymentStatus === "SUCCESS") {
-        res.json({
-          status: "success",
-          message: "Payment Successful",
-          paymentDetails: paymentData,
-        });
-      } else if (paymentStatus === "FAILED") {
-        res.json({
-          status: "failed",
-          message: "Payment Failed",
-          paymentDetails: paymentData,
-        });
-      } else {
-        res.json({
-          status: "pending",
-          message: "Payment Pending",
-          paymentDetails: paymentData,
-        });
-      }
+    const paymentData = paymentList[0];
+    const paymentStatus = paymentData.payment_status;
+
+    if (paymentStatus === "SUCCESS") {
+      res.json({
+        status: "success",
+        message: "Payment Successful",
+        paymentDetails: paymentData,
+      });
+    } else if (paymentStatus === "FAILED") {
+      res.json({
+        status: "failed",
+        message: "Payment Failed",
+        paymentDetails: paymentData,
+      });
     } else {
-      res.status(400).json({ error: "No payment details found for this order" });
+      res.json({
+        status: "pending",
+        message: "Payment Pending",
+        paymentDetails: paymentData,
+      });
     }
   } catch (error) {
     console.error("❌ Payment Verification Error:", error.response?.data || error.message);
