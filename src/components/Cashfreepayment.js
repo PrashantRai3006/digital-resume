@@ -29,7 +29,7 @@ const CashfreePayment = () => {
   useEffect(() => {
     const initializeSDK = async () => {
       try {
-        const cashfreeInstance = await load({ mode: "sandbox" }); // or "production"
+        const cashfreeInstance = await load({ mode: "production" }); // or "production"
         setCashfree(cashfreeInstance);
         console.log("✅ Cashfree SDK Loaded");
       } catch (err) {

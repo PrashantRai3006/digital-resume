@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(cors());
 
 const { CASHFREE_APP_ID, CASHFREE_SECRET_KEY } = process.env;
-const BASE_URL = "https://sandbox.cashfree.com/pg"; // Change to production URL when deploying
+const BASE_URL = "https://api.cashfree.com/pg"; // Change to production URL when deploying
 
 // ✅ Create Payment Order
 app.post("/create-order", async (req, res) => {
