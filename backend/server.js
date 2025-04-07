@@ -5,22 +5,17 @@ const cors = require("cors");
 
 const app = express();
 app.use(express.json());
-
-// ✅ CORS with your frontend domain
-app.use(cors({
-  origin: ["http://localhost:3000", "https://digitalresumebuilder.com"], // Replace with your actual domain
-}));
+app.use(cors());
 
 const { CASHFREE_APP_ID, CASHFREE_SECRET_KEY } = process.env;
-
-// ✅ Use sandbox URL for testing, switch to prod in live
-const BASE_URL = "https://api.cashfree.com/pg";
+const BASE_URL = "https://sandbox.cashfree.com/pg"; // Change to production URL when deploying
 
 // ✅ Create Payment Order
 app.post("/create-order", async (req, res) => {
   try {
     const { orderId, orderAmount, customerName, customerEmail, customerPhone } = req.body;
 
+    // Creating payment order using Cashfree API
     const sessionResponse = await axios.post(
       `${BASE_URL}/orders`,
       {
@@ -28,7 +23,7 @@ app.post("/create-order", async (req, res) => {
         order_amount: orderAmount,
         order_currency: "INR",
         order_meta: {
-          return_url: `https://digitalresumebuilder.com/payment-success?order_id={order_id}`, // ✅ Your domain
+          return_url: "http://localhost:3000/payment-success", // URL to redirect after payment
         },
         customer_details: {
           customer_id: customerPhone,
@@ -48,7 +43,7 @@ app.post("/create-order", async (req, res) => {
     );
 
     console.log("✅ Order Created:", sessionResponse.data);
-    res.json(sessionResponse.data);
+    res.json(sessionResponse.data);  // Send the response with session_id
   } catch (error) {
     console.error("❌ Cashfree API Error:", error.response?.data || error.message);
     res.status(500).json({ error: "Payment order creation failed", details: error.response?.data });
@@ -60,6 +55,7 @@ app.get("/verify-payment/:orderId", async (req, res) => {
   try {
     const { orderId } = req.params;
 
+    // Fetching the payment status using Cashfree API
     const response = await axios.get(`${BASE_URL}/orders/${orderId}/payments`, {
       headers: {
         "x-client-id": CASHFREE_APP_ID,
@@ -69,38 +65,37 @@ app.get("/verify-payment/:orderId", async (req, res) => {
       },
     });
 
+    // Log the entire response to verify structure
     console.log("✅ Payment Status Response:", response.data);
 
-    const paymentList = response.data.payments;
+    // Extracting the payment status from the first object in the array
+    const paymentData = response.data[0];  // Since the response is an array, access the first object
 
-    if (!paymentList || paymentList.length === 0) {
-      return res.json({
-        status: "pending",
-        message: "No payments yet for this order",
-      });
-    }
+    if (paymentData) {
+      const paymentStatus = paymentData.payment_status;
 
-    const paymentData = paymentList[0];
-    const paymentStatus = paymentData.payment_status;
-
-    if (paymentStatus === "SUCCESS") {
-      res.json({
-        status: "success",
-        message: "Payment Successful",
-        paymentDetails: paymentData,
-      });
-    } else if (paymentStatus === "FAILED") {
-      res.json({
-        status: "failed",
-        message: "Payment Failed",
-        paymentDetails: paymentData,
-      });
+      // Respond based on the payment status
+      if (paymentStatus === "SUCCESS") {
+        res.json({
+          status: "success",
+          message: "Payment Successful",
+          paymentDetails: paymentData,
+        });
+      } else if (paymentStatus === "FAILED") {
+        res.json({
+          status: "failed",
+          message: "Payment Failed",
+          paymentDetails: paymentData,
+        });
+      } else {
+        res.json({
+          status: "pending",
+          message: "Payment Pending",
+          paymentDetails: paymentData,
+        });
+      }
     } else {
-      res.json({
-        status: "pending",
-        message: "Payment Pending",
-        paymentDetails: paymentData,
-      });
+      res.status(400).json({ error: "No payment details found for this order" });
     }
   } catch (error) {
     console.error("❌ Payment Verification Error:", error.response?.data || error.message);

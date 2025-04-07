@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { load } from "@cashfreepayments/cashfree-js";
 import { doc, setDoc } from "firebase/firestore";
-import { db, auth } from "./firebase";
+import { db, auth } from "./firebase"; // Firestore instance
 import { Box, Button, Typography } from "@mui/material";
-import { onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const CashfreePayment = () => {
   const [loading, setLoading] = useState(false);
@@ -14,35 +14,40 @@ const CashfreePayment = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  const MODE = process.env.REACT_APP_PAYMENT_MODE || "production"; // "sandbox" or "production"
-  const PAYMENT_URL = process.env.REACT_APP_PAYMENT_URL;
-
+  // ✅ Get Authenticated User Safely
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      if (u) setUser(u);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      }
     });
+
     return () => unsubscribe();
   }, []);
 
+  // ✅ Initialize Cashfree SDK once
   useEffect(() => {
     const initializeSDK = async () => {
       try {
-        const instance = await load({ mode: MODE });
-        setCashfree(instance);
-        console.log("✅ Cashfree SDK Loaded in", MODE.toUpperCase(), "mode");
+        const cashfreeInstance = await load({ mode: "sandbox" }); // or "production"
+        setCashfree(cashfreeInstance);
+        console.log("✅ Cashfree SDK Loaded");
       } catch (err) {
         console.error("❌ Failed to Load Cashfree SDK:", err);
       }
     };
+
     initializeSDK();
-  }, [MODE]);
+  }, []);
 
+  // ✅ Updates Firestore when payment status changes
   useEffect(() => {
-    if (!user || !paymentStatus) return;
-
     const updatePaymentStatus = async () => {
+      if (!user || !paymentStatus) return;
+      console.log("🔄 Updating Payment Status in Firestore");
+
+      const userRef = doc(db, "users", user.uid);
       try {
-        const userRef = doc(db, "users", user.uid);
         await setDoc(
           userRef,
           {
@@ -53,50 +58,60 @@ const CashfreePayment = () => {
         );
         console.log("✅ Payment Status Updated in Firestore");
       } catch (error) {
-        console.error("❌ Error updating Firestore:", error);
+        console.error("❌ Error updating payment status:", error);
       }
     };
 
     updatePaymentStatus();
   }, [paymentStatus, user]);
 
+  // ✅ Handle Payment
   const handlePayment = async () => {
     setLoading(true);
     setPaymentStatus(null);
 
     try {
-      const generatedOrderId = `ORDER_${Date.now()}`;
-      setOrderId(generatedOrderId);
+      const orderID = `ORDER_${Date.now()}`;
+      setOrderId(orderID);
 
-      const response = await fetch(`${PAYMENT_URL}/create-order`, {
+      const response = await fetch(`${process.env.REACT_APP_PAYMENT_URL}/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderId: generatedOrderId,
-          orderAmount: 1,
+          orderId: orderID,
+          orderAmount: 100,
           customerName: user?.displayName || "John Doe",
           customerEmail: user?.email || "johndoe@example.com",
           customerPhone: "9999999999",
         }),
       });
 
-      if (!response.ok) throw new Error(`❌ Server Error: ${response.status}`);
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`❌ Server Error: ${response.status}`);
+      }
 
-      if (!data.payment_session_id) throw new Error("❌ No session ID returned");
+      const data = await response.json();
+      console.log("🔄 API Response:", data);
+
+      if (!data.payment_session_id) {
+        throw new Error("❌ Payment session ID not received");
+      }
 
       const sessionId = data.payment_session_id;
-      console.log("✅ Session ID Received:", sessionId);
+      console.log("✅ Payment Session ID:", sessionId);
 
-      if (!cashfree) throw new Error("❌ Cashfree SDK not initialized");
+      if (!cashfree) {
+        throw new Error("❌ Cashfree SDK not initialized");
+      }
 
       await cashfree.checkout({
         paymentSessionId: sessionId,
         redirectTarget: "_modal",
       });
 
-      console.log("✅ Payment Modal Opened");
-      pollPaymentStatus(generatedOrderId);
+      console.log("✅ Payment Initiated");
+      pollPaymentStatus(orderID);
+
     } catch (err) {
       console.error("❌ Payment Error:", err);
       setPaymentStatus("error");
@@ -105,17 +120,20 @@ const CashfreePayment = () => {
     }
   };
 
+  // ✅ Verify Payment & Polling
   const pollPaymentStatus = async (orderID) => {
     let attempts = 0;
-    const maxAttempts = 6;
+    const maxAttempts = 6; // Try for ~30 seconds
 
     while (attempts < maxAttempts) {
       try {
-        const response = await fetch(`${PAYMENT_URL}/verify-payment/${orderID}`);
-        if (!response.ok) throw new Error(`❌ Server Error: ${response.status}`);
+        const response = await fetch(`${process.env.REACT_APP_PAYMENT_URL}/verify-payment/${orderID}`);
+        if (!response.ok) {
+          throw new Error(`❌ Server Error: ${response.status}`);
+        }
 
         const data = await response.json();
-        console.log("🔍 Poll Result:", data);
+        console.log("🔍 Payment Status Check:", data);
 
         if (data.status === "success") {
           setPaymentStatus("success");
@@ -125,10 +143,10 @@ const CashfreePayment = () => {
           setPaymentStatus("failed");
           return;
         }
+
       } catch (error) {
-        console.error("❌ Polling Error:", error);
+        console.error("❌ Error checking payment:", error);
         setPaymentStatus("error");
-        return;
       }
 
       attempts++;
@@ -137,45 +155,46 @@ const CashfreePayment = () => {
   };
 
   return (
-    <Box textAlign="center">
-      <Typography variant="h5" color="white" fontWeight="bold" mb={2}>
-        Unlock Your Resume
-      </Typography>
-
-      <Button
-        variant="contained"
-        color="primary"
-        size="large"
-        onClick={handlePayment}
-        disabled={loading || !cashfree}
-      >
-        {loading ? "Processing..." : "Proceed to Payment"}
-      </Button>
+    <>
+        {loading ? "Processing..." : <>
+          <Typography variant="h5" color="white" fontWeight="bold" mb={2}>
+            Unlock Your Resume
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={handlePayment}
+            disabled={loading || !cashfree}
+          >
+            Proceed to Payment
+          </Button>
+        </>}
 
       {paymentStatus === "success" && (
-        <Typography color="green" mt={2}>
-          ✅ Payment Successful! Thank you.
-        </Typography>
+        <div style={{ color: "green", marginTop: "20px" }}>
+          ✅ Payment Successful! Thank you for your purchase.
+        </div>
       )}
 
       {paymentStatus === "failed" && (
-        <Typography color="red" mt={2}>
+        <div style={{ color: "red", marginTop: "20px" }}>
           ❌ Payment Failed. Please try again.
-        </Typography>
+        </div>
       )}
 
       {paymentStatus === "pending" && (
-        <Typography color="orange" mt={2}>
-          ⏳ Payment pending. Please wait.
-        </Typography>
+        <div style={{ color: "orange", marginTop: "20px" }}>
+          ⏳ Payment is pending. Please wait for confirmation.
+        </div>
       )}
 
       {paymentStatus === "error" && (
-        <Typography color="orange" mt={2}>
+        <div style={{ color: "orange", marginTop: "20px" }}>
           ⚠️ Error verifying payment. Contact support.
-        </Typography>
+        </div>
       )}
-    </Box>
+    </>
   );
 };
 
