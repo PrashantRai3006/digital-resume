@@ -33,7 +33,7 @@ const LoginPage = ({ dynamicNavigation }) => {
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
-      dynamicNavigation("/form");
+      dynamicNavigation("/file-upload");
     } catch (err) {
       const rawMessage = err.message
         .replace(/auth\//g, "") // Remove "auth/"
