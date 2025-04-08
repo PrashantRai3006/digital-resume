@@ -500,232 +500,196 @@ const ResumeForm = ({ setFormData, formData, dynamicNavigation }) => {
         </Grid>
         {/* Education Details */}
         <Grid item xs={12}>
-          <Typography
-            variant="h5"
-            sx={{ color: "#3f51b5", marginBottom: "16px" }}
-          >
-            Education Details
-          </Typography>
-          <Grid container spacing={2}>
-            {/* Display Added Education Entries */}
-            {Boolean(educationDetails.length) && (
-              <Grid item xs={12}>
-                <Box
-                  sx={{ display: "flex", flexDirection: "column", gap: "10px" }}
-                >
-                  {educationDetails.map((edu, index) => (
-                    <Grid
-                      container
-                      key={index}
-                      spacing={2}
-                      sx={{
-                        alignItems: "center",
-                        backgroundColor: "aliceblue",
-
-                        borderRadius: "12px",
-                      }}
-                    >
-                      <Grid item xs={3.6}>
-                        <TextField
-                          fullWidth
-                          required
-                          value={edu.school}
-                          onChange={(e) =>
-                            handleEducationChange(
-                              index,
-                              "school",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Enter College/School"
-                          sx={{ background: "white", borderRadius: "8px" }}
-                        />
-                      </Grid>
-                      <Grid item xs={2}>
-                        <TextField
-                          fullWidth
-                          required
-                          value={edu.degree}
-                          onChange={(e) =>
-                            handleEducationChange(
-                              index,
-                              "degree",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Degree"
-                          sx={{ background: "white", borderRadius: "8px" }}
-                        />
-                      </Grid>
-                      <Grid item xs={1.8}>
-                        <TextField
-                          fullWidth
-                          type="number"
-                          required
-                          value={edu.startYear}
-                          onChange={(e) =>
-                            handleEducationChange(
-                              index,
-                              "startYear",
-                              e.target.value
-                            )
-                          }
-                          placeholder="YYYY"
-                          sx={{ background: "white", borderRadius: "8px" }}
-                        />
-                      </Grid>
-                      <Grid item xs={1.8}>
-                        <TextField
-                          fullWidth
-                          type="number"
-                          required
-                          value={edu.endYear}
-                          onChange={(e) =>
-                            handleEducationChange(
-                              index,
-                              "endYear",
-                              e.target.value
-                            )
-                          }
-                          placeholder="YYYY"
-                          sx={{ background: "white", borderRadius: "8px" }}
-                        />
-                      </Grid>
-                      <Grid item xs={1.8}>
-                        <TextField
-                          fullWidth
-                          type="number"
-                          required
-                          value={edu.percentage}
-                          onChange={(e) =>
-                            handleEducationChange(
-                              index,
-                              "percentage",
-                              e.target.value
-                            )
-                          }
-                          placeholder="%"
-                          sx={{ background: "white", borderRadius: "8px" }}
-                        />
-                      </Grid>
-                      <Grid item xs={1}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleRemoveEducation(index)}
-                          color="error"
-                        >
-                          <DeleteForever />
-                        </IconButton>
-                      </Grid>
-                    </Grid>
-                  ))}
-                </Box>
+  <Typography
+    variant="h5"
+    sx={{ color: "#3f51b5", marginBottom: "16px" }}
+  >
+    Education Details
+  </Typography>
+  <Grid container spacing={2}>
+    {/* Display Added Education Entries */}
+    {Boolean(educationDetails.length) && (
+      <Grid item xs={12}>
+        <Box
+          sx={{ display: "flex", flexDirection: "column", gap: "10px" }}
+        >
+          {educationDetails.map((edu, index) => (
+            <Grid
+              container
+              key={index}
+              spacing={2}
+              sx={{
+                alignItems: "center",
+                backgroundColor: "aliceblue",
+                borderRadius: "12px",
+              }}
+            >
+              <Grid item xs={3.6}>
+                <TextField
+                  fullWidth
+                  required
+                  value={edu.school}
+                  onChange={(e) =>
+                    handleEducationChange(index, "school", e.target.value)
+                  }
+                  placeholder="Enter College/School"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
               </Grid>
-            )}
-
-            {/* Input Fields for Adding a New Entry */}
-            <Grid item xs={12}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={3.6}>
-                  <TextField
-                    fullWidth
-                    label="College/School"
-                    required
-                    value={newEducation.school}
-                    onChange={(e) =>
-                      setNewEducation({
-                        ...newEducation,
-                        school: e.target.value,
-                      })
-                    }
-                    placeholder="Enter College/School"
-                    sx={{ background: "white", borderRadius: "8px" }}
-                  />
-                </Grid>
-                <Grid item xs={2}>
-                  <TextField
-                    fullWidth
-                    label="Degree"
-                    required
-                    value={newEducation.degree}
-                    onChange={(e) =>
-                      setNewEducation({
-                        ...newEducation,
-                        degree: e.target.value,
-                      })
-                    }
-                    placeholder="Degree"
-                    sx={{ background: "white", borderRadius: "8px" }}
-                  />
-                </Grid>
-                <Grid item xs={1.8}>
-                  <TextField
-                    fullWidth
-                    label="Start Year"
-                    type="number"
-                    required
-                    value={newEducation.startYear}
-                    onChange={(e) =>
-                      setNewEducation({
-                        ...newEducation,
-                        startYear: e.target.value,
-                      })
-                    }
-                    placeholder="YYYY"
-                    sx={{ background: "white", borderRadius: "8px" }}
-                  />
-                </Grid>
-                <Grid item xs={1.8}>
-                  <TextField
-                    fullWidth
-                    label="End Year"
-                    type="number"
-                    required
-                    value={newEducation.endYear}
-                    onChange={(e) =>
-                      setNewEducation({
-                        ...newEducation,
-                        endYear: e.target.value,
-                      })
-                    }
-                    placeholder="YYYY"
-                    sx={{ background: "white", borderRadius: "8px" }}
-                  />
-                </Grid>
-                <Grid item xs={1.8}>
-                  <TextField
-                    fullWidth
-                    label="Percentage"
-                    type="number"
-                    required
-                    value={newEducation.percentage}
-                    onChange={(e) =>
-                      setNewEducation({
-                        ...newEducation,
-                        percentage: e.target.value,
-                      })
-                    }
-                    placeholder="%"
-                    sx={{ background: "white", borderRadius: "8px" }}
-                  />
-                </Grid>
-                <Grid item xs={1}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleAddEducation}
-                    sx={{
-                      borderRadius: "16px",
-                      height: "56px",
-                    }}
-                  >
-                    Add
-                  </Button>
-                </Grid>
+              <Grid item xs={2}>
+                <TextField
+                  fullWidth
+                  required
+                  value={edu.degree}
+                  onChange={(e) =>
+                    handleEducationChange(index, "degree", e.target.value)
+                  }
+                  placeholder="Degree"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
+              </Grid>
+              <Grid item xs={1.8}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  required
+                  value={edu.startYear}
+                  onChange={(e) =>
+                    handleEducationChange(index, "startYear", e.target.value)
+                  }
+                  placeholder="YYYY"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
+              </Grid>
+              <Grid item xs={1.8}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  required
+                  value={edu.endYear}
+                  onChange={(e) =>
+                    handleEducationChange(index, "endYear", e.target.value)
+                  }
+                  placeholder="YYYY"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
+              </Grid>
+              <Grid item xs={1.8}>
+                <TextField
+                  fullWidth
+                  required
+                  value={edu.percentage}
+                  onChange={(e) =>
+                    handleEducationChange(index, "percentage", e.target.value)
+                  }
+                  label="% or CGPA"
+                  placeholder="% or CGPA"
+                  sx={{ background: "white", borderRadius: "8px" }}
+                />
+              </Grid>
+              <Grid item xs={1}>
+                <IconButton
+                  size="small"
+                  onClick={() => handleRemoveEducation(index)}
+                  color="error"
+                >
+                  <DeleteForever />
+                </IconButton>
               </Grid>
             </Grid>
-          </Grid>
+          ))}
+        </Box>
+      </Grid>
+    )}
+
+    {/* Input Fields for Adding a New Entry */}
+    <Grid item xs={12}>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={3.6}>
+          <TextField
+            fullWidth
+            label="College/School"
+            required
+            value={newEducation.school}
+            onChange={(e) =>
+              setNewEducation({ ...newEducation, school: e.target.value })
+            }
+            placeholder="Enter College/School"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
         </Grid>
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            label="Degree"
+            required
+            value={newEducation.degree}
+            onChange={(e) =>
+              setNewEducation({ ...newEducation, degree: e.target.value })
+            }
+            placeholder="Degree"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
+        </Grid>
+        <Grid item xs={1.8}>
+          <TextField
+            fullWidth
+            label="Start Year"
+            type="number"
+            required
+            value={newEducation.startYear}
+            onChange={(e) =>
+              setNewEducation({ ...newEducation, startYear: e.target.value })
+            }
+            placeholder="YYYY"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
+        </Grid>
+        <Grid item xs={1.8}>
+          <TextField
+            fullWidth
+            label="End Year"
+            type="number"
+            required
+            value={newEducation.endYear}
+            onChange={(e) =>
+              setNewEducation({ ...newEducation, endYear: e.target.value })
+            }
+            placeholder="YYYY"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
+        </Grid>
+        <Grid item xs={1.8}>
+          <TextField
+            fullWidth
+            label="% or CGPA"
+            required
+            value={newEducation.percentage}
+            onChange={(e) =>
+              setNewEducation({ ...newEducation, percentage: e.target.value })
+            }
+            placeholder="% or CGPA"
+            sx={{ background: "white", borderRadius: "8px" }}
+          />
+        </Grid>
+        <Grid item xs={1}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddEducation}
+            sx={{
+              borderRadius: "16px",
+              height: "56px",
+            }}
+          >
+            Add
+          </Button>
+        </Grid>
+      </Grid>
+    </Grid>
+  </Grid>
+</Grid>
+
 
         {/* Certification */}
         <Grid item xs={12}>

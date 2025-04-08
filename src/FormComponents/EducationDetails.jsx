@@ -56,7 +56,7 @@ export default function EducationDetails({
                       pageBreakInside: "avoid",
                     }}
                   >
-                    {edu.school} {edu.percentage ? `- ${edu.percentage}%` : ""}
+                    {edu.school} {edu.percentage ? `- ${edu.percentage}` : ""}
                   </Typography>
                 </Box>
               </Grid>
@@ -77,7 +77,7 @@ export default function EducationDetails({
                 }}
               >
                 {edu.degree} | {edu.school} | {edu.startYear} - {edu.endYear}
-                {edu.percentage ? ` | ${edu.percentage}%` : ""}
+                {edu.percentage ? ` | ${edu.percentage}` : ""}
               </Typography>
             ))}
           </Box>
