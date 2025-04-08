@@ -14,6 +14,7 @@ import ResumePreview from "./components/ResumePreview";
 import "./index.css"
 import ResumeUploader from "./components/ResumeUploader";
 import ResumeLoader from "./components/ResumeLoader";
+import PaymentSuccess from "./components/PaymentSuccess";
 const App = () => {
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("formData");
