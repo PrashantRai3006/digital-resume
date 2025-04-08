@@ -35,25 +35,37 @@ const CashfreePayment = () => {
   }, []);
 
   useEffect(() => {
-    if (!user || !paymentStatus || !currentOrderId) return;
-
+    const formDataString = localStorage.getItem("formData");
+    let email = null;
+  
+    try {
+      const formData = JSON.parse(formDataString);
+      email = formData?.email;
+    } catch (err) {
+      console.error("❌ Failed to parse formData from localStorage:", err);
+    }
+  
+    if (!user || !paymentStatus || !email) return;
+  
     const updateStatusInFirestore = async () => {
       try {
         await setDoc(
-          doc(db, "users", user.uid, "payments", currentOrderId),
+          doc(db, "users", user.uid, "payments", email),
           {
             status: paymentStatus,
             timestamp: new Date(),
-          }
+          },
+          { merge: true }
         );
         console.log("✅ Firestore payment status updated");
       } catch (err) {
         console.error("❌ Firestore update failed:", err);
       }
     };
-
+  
     updateStatusInFirestore();
-  }, [paymentStatus, user, currentOrderId]);
+  }, [paymentStatus, user]);
+  
 
   const handlePayment = async () => {
     setLoading(true);
