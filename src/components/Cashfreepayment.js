@@ -35,35 +35,32 @@ const CashfreePayment = () => {
   }, []);
 
   useEffect(() => {
-    const formDataString = localStorage.getItem("formData");
-    let email = null;
-  
-    try {
+    const updatePaymentStatus = async () => {
+      const formDataString = localStorage.getItem("formData");
       const formData = JSON.parse(formDataString);
-      email = formData?.email;
-    } catch (err) {
-      console.error("❌ Failed to parse formData from localStorage:", err);
-    }
-  
-    if (!user || !paymentStatus || !email) return;
-  
-    const updateStatusInFirestore = async () => {
+      let email = formData?.email || "null"
+    
+      if (!user || !paymentStatus) return;
+      console.log("🔄 Updating Payment Status in Firestore");
+
+      const userRef = doc(db, "users", user.uid);
       try {
         await setDoc(
-          doc(db, "users", user.uid, "payments", email),
+          userRef,
           {
-            status: paymentStatus,
-            timestamp: new Date(),
+            paymentStatus: paymentStatus,
+            paymentTimestamp: new Date(),
+            emailId: email,
           },
           { merge: true }
         );
-        console.log("✅ Firestore payment status updated");
-      } catch (err) {
-        console.error("❌ Firestore update failed:", err);
+        console.log("✅ Payment Status Updated in Firestore");
+      } catch (error) {
+        console.error("❌ Error updating payment status:", error);
       }
     };
-  
-    updateStatusInFirestore();
+
+    updatePaymentStatus();
   }, [paymentStatus, user]);
   
 
