@@ -11,6 +11,7 @@ const CashfreePayment = () => {
   const [cashfree, setCashfree] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [user, setUser] = useState(null);
+  const [currentOrderId, setCurrentOrderId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,17 +35,16 @@ const CashfreePayment = () => {
   }, []);
 
   useEffect(() => {
-    if (!user || !paymentStatus) return;
+    if (!user || !paymentStatus || !currentOrderId) return;
 
     const updateStatusInFirestore = async () => {
       try {
         await setDoc(
-          doc(db, "users", user.uid),
+          doc(db, "users", user.uid, "payments", currentOrderId),
           {
-            paymentStatus,
-            paymentTimestamp: new Date(),
-          },
-          { merge: true }
+            status: paymentStatus,
+            timestamp: new Date(),
+          }
         );
         console.log("✅ Firestore payment status updated");
       } catch (err) {
@@ -53,12 +53,13 @@ const CashfreePayment = () => {
     };
 
     updateStatusInFirestore();
-  }, [paymentStatus, user]);
+  }, [paymentStatus, user, currentOrderId]);
 
   const handlePayment = async () => {
     setLoading(true);
     setPaymentStatus(null);
     const orderID = `ORDER_${Date.now()}`;
+    setCurrentOrderId(orderID);
 
     try {
       const res = await fetch(`${process.env.REACT_APP_PAYMENT_URL}/create-order`, {
@@ -104,13 +105,16 @@ const CashfreePayment = () => {
 
         if (data.status === "success") {
           setPaymentStatus("success");
-          navigate("/payment-success");
+          navigate(`/payment-success?order_id=${orderID}`);
+          setLoading(false);
           return;
         } else if (data.status === "failed") {
           setPaymentStatus("failed");
+          setLoading(false);
           return;
-        }else if (data.error === "No payment details found for this order") {
+        } else if (data.error?.includes("No payment details")) {
           setPaymentStatus("error");
+          setLoading(false);
           return;
         }
       } catch (err) {
@@ -142,7 +146,7 @@ const CashfreePayment = () => {
             color="primary"
             size="large"
             onClick={handlePayment}
-            disabled={!cashfree}
+            disabled={!cashfree || loading}
           >
             Proceed to Payment
           </Button>
@@ -155,9 +159,14 @@ const CashfreePayment = () => {
         </Typography>
       )}
       {paymentStatus === "failed" && (
-        <Typography mt={3} color="red">
-          ❌ Payment Failed. Please try again.
-        </Typography>
+        <>
+          <Typography mt={3} color="red">
+            ❌ Payment Failed. Please try again.
+          </Typography>
+          <Button variant="outlined" color="warning" onClick={handlePayment} sx={{ mt: 2 }}>
+            Retry Payment
+          </Button>
+        </>
       )}
       {paymentStatus === "pending" && (
         <Typography mt={3} color="orange">
@@ -165,9 +174,14 @@ const CashfreePayment = () => {
         </Typography>
       )}
       {paymentStatus === "error" && (
-        <Typography mt={3} color="orange">
-          ⚠️ Something went wrong. Please contact support.
-        </Typography>
+        <>
+          <Typography mt={3} color="orange">
+            ⚠️ Something went wrong. Please contact support.
+          </Typography>
+          <Button variant="outlined" color="warning" onClick={handlePayment} sx={{ mt: 2 }}>
+            Retry Payment
+          </Button>
+        </>
       )}
     </Box>
   );
