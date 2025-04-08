@@ -54,6 +54,8 @@ const App = () => {
           <Route path="/digital-resume/:id" element={<TemplateRender formData={formData} dynamicNavigation={navigateTo} />} />
           <Route path="/thank-you" element={<ThankYouPage dynamicNavigation={navigateTo} formData={formData} />} />
           <Route path="/resume-preview" element={<ResumePreview />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+
         </Route>
       </Routes>
     </ConditionalLayout>

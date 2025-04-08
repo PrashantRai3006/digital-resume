@@ -23,7 +23,7 @@ app.post("/create-order", async (req, res) => {
         order_amount: orderAmount,
         order_currency: "INR",
         order_meta: {
-          return_url: "http://localhost:3000/payment-success", // URL to redirect after payment
+          return_url: "https://digitalresumebuilder.com/payment-success", // URL to redirect after payment
         },
         customer_details: {
           customer_id: customerPhone,
