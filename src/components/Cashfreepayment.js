@@ -148,25 +148,20 @@ const CashfreePayment = () => {
             onClick={handlePayment}
             disabled={!cashfree || loading}
           >
-            Proceed to Payment
+            {paymentStatus === "failed" ? "Retry Payment" : "Proceed to Payment"}
           </Button>
         </>
       )}
-
+  
       {paymentStatus === "success" && (
         <Typography mt={3} color="green">
           ✅ Payment Successful! Redirecting to your resume...
         </Typography>
       )}
       {paymentStatus === "failed" && (
-        <>
-          <Typography mt={3} color="red">
-            ❌ Payment Failed. Please try again.
-          </Typography>
-          <Button variant="outlined" color="warning" onClick={handlePayment} sx={{ mt: 2 }}>
-            Retry Payment
-          </Button>
-        </>
+        <Typography mt={3} color="red">
+          ❌ Payment Failed. Please try again.
+        </Typography>
       )}
       {paymentStatus === "pending" && (
         <Typography mt={3} color="orange">
@@ -174,17 +169,13 @@ const CashfreePayment = () => {
         </Typography>
       )}
       {paymentStatus === "error" && (
-        <>
-          <Typography mt={3} color="orange">
-            ⚠️ Something went wrong. Please contact support.
-          </Typography>
-          <Button variant="outlined" color="warning" onClick={handlePayment} sx={{ mt: 2 }}>
-            Retry Payment
-          </Button>
-        </>
+        <Typography mt={3} color="orange">
+          ⚠️ Something went wrong. Please contact support.
+        </Typography>
       )}
     </Box>
   );
+  
 };
 
 export default CashfreePayment;
