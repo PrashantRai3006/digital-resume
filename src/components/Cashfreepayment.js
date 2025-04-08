@@ -166,6 +166,11 @@ const CashfreePayment = () => {
           ⚠️ Something went wrong. Please contact support.
         </Typography>
       )}
+      {paymentStatus === "No payment details found for this order" && (
+        <Typography mt={3} color="warning.main">
+        ⚠️ Something went wrong. Please contact support.
+      </Typography>
+      )}
     </Box>
   );
 };
