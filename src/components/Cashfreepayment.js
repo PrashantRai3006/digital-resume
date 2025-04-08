@@ -110,7 +110,6 @@ const CashfreePayment = () => {
       try {
         const res = await fetch(`${process.env.REACT_APP_PAYMENT_URL}/verify-payment/${orderID}`);
         const data = await res.json();
-        console.log("🔍 Polling:", data);
 
         if (data.status === "success") {
           setPaymentStatus("success");

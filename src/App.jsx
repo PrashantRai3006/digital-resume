@@ -33,7 +33,6 @@ const App = () => {
   // Authenticate User
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("Authenticated User:", currentUser);
       setUser(currentUser);
       setLoading(false);
     });

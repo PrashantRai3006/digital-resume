@@ -20,9 +20,7 @@ const PaymentSuccess = () => {
 
       try {
         const response = await fetch(`${PAYMENT_URL}/verify-payment/${orderId}`);
-        console.log("response", response);
         const data = await response.json();
-        console.log("✅ Verification response:", data);
 
         if (data.status === "success") {
           setStatus("success");
