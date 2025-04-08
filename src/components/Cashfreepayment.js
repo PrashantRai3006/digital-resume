@@ -109,6 +109,9 @@ const CashfreePayment = () => {
         } else if (data.status === "failed") {
           setPaymentStatus("failed");
           return;
+        }else if (data.error === "No payment details found for this order") {
+          setPaymentStatus("error");
+          return;
         }
       } catch (err) {
         console.error("❌ Error polling payment:", err);
@@ -165,11 +168,6 @@ const CashfreePayment = () => {
         <Typography mt={3} color="orange">
           ⚠️ Something went wrong. Please contact support.
         </Typography>
-      )}
-      {paymentStatus === "No payment details found for this order" && (
-        <Typography mt={3} color="warning.main">
-        ⚠️ Something went wrong. Please contact support.
-      </Typography>
       )}
     </Box>
   );

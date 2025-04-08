@@ -20,13 +20,14 @@ const PaymentSuccess = () => {
 
       try {
         const response = await fetch(`${PAYMENT_URL}/verify-payment/${orderId}`);
-        if (!response.ok) throw new Error("Failed to verify payment");
-
+        console.log("response", response);
         const data = await response.json();
         console.log("✅ Verification response:", data);
 
         if (data.status === "success") {
           setStatus("success");
+        } else if (data.error === "No payment details found for this order") {
+          setStatus("not_found");
         } else {
           setStatus("failed");
         }
@@ -43,6 +44,10 @@ const PaymentSuccess = () => {
     navigate("/digital-resume/1");
   };
 
+  const handleRetry = () => {
+    navigate("/resume-preview");
+  };
+
   return (
     <Box
       textAlign="center"
@@ -53,8 +58,8 @@ const PaymentSuccess = () => {
       height="100vh"
       px={2}
       sx={{
-        backgroundColor: "#001f3f", // dark blue background
-        color: "#ffffff",           // white text
+        backgroundColor: "#001f3f",
+        color: "#ffffff",
       }}
     >
       {status === "loading" && (
@@ -81,12 +86,20 @@ const PaymentSuccess = () => {
         </>
       )}
 
-      {status === "failed" && (
+      {(status === "failed" || status === "not_found") && (
         <>
           <Typography variant="h5" fontWeight="bold" color="error.main">
             ❌ Payment Failed
           </Typography>
           <Typography mt={1}>Please try again or contact support.</Typography>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={handleRetry}
+            sx={{ mt: 3 }}
+          >
+            Retry Payment
+          </Button>
         </>
       )}
 
@@ -96,6 +109,14 @@ const PaymentSuccess = () => {
             ⚠️ Something went wrong
           </Typography>
           <Typography mt={1}>Unable to verify your payment. Contact support.</Typography>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={handleRetry}
+            sx={{ mt: 3 }}
+          >
+            Back to Payment
+          </Button>
         </>
       )}
     </Box>
