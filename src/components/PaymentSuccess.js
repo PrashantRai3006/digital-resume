@@ -50,25 +50,29 @@ const PaymentSuccess = () => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      height="80vh"
+      height="100vh"
       px={2}
+      sx={{
+        backgroundColor: "#001f3f", // dark blue background
+        color: "#ffffff",           // white text
+      }}
     >
       {status === "loading" && (
         <>
-          <CircularProgress />
+          <CircularProgress sx={{ color: "white" }} />
           <Typography mt={2}>Verifying your payment...</Typography>
         </>
       )}
 
       {status === "success" && (
         <>
-          <Typography variant="h5" color="green" fontWeight="bold">
+          <Typography variant="h5" fontWeight="bold" color="success.main">
             ✅ Payment Successful!
           </Typography>
           <Typography mt={1}>Thank you for your payment.</Typography>
           <Button
             variant="contained"
-            color="primary"
+            color="success"
             onClick={handleGoToResume}
             sx={{ mt: 3 }}
           >
@@ -79,7 +83,7 @@ const PaymentSuccess = () => {
 
       {status === "failed" && (
         <>
-          <Typography variant="h5" color="red" fontWeight="bold">
+          <Typography variant="h5" fontWeight="bold" color="error.main">
             ❌ Payment Failed
           </Typography>
           <Typography mt={1}>Please try again or contact support.</Typography>
@@ -88,7 +92,7 @@ const PaymentSuccess = () => {
 
       {status === "error" && (
         <>
-          <Typography variant="h5" color="orange" fontWeight="bold">
+          <Typography variant="h5" fontWeight="bold" color="warning.main">
             ⚠️ Something went wrong
           </Typography>
           <Typography mt={1}>Unable to verify your payment. Contact support.</Typography>

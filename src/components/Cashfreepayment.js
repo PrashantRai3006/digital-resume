@@ -104,7 +104,7 @@ const CashfreePayment = () => {
 
         if (data.status === "success") {
           setPaymentStatus("success");
-          navigate("/digital-resume/1");
+          navigate("/payment-success");
           return;
         } else if (data.status === "failed") {
           setPaymentStatus("failed");
