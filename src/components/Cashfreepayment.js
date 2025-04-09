@@ -76,7 +76,7 @@ const CashfreePayment = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId: orderID,
-          orderAmount: 1,
+          orderAmount: 129,
           customerName: user?.displayName || "Guest",
           customerEmail: user?.email || "guest@example.com",
           customerPhone: "9999999999",

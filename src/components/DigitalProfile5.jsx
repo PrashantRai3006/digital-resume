@@ -137,7 +137,7 @@ const DigitalProfile5 = ({ formData, dynamicNavigation, handleSubmit }) => {
                 {role || "Your Role"}
               </Typography>
             </Box>
-            <Box>
+            <Box paddingTop={"5px"}>
               <Box>
                 <Typography variant="body1">
                   {number || "Your Phone"}
