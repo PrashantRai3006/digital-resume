@@ -15,6 +15,7 @@ import "./index.css"
 import ResumeUploader from "./components/ResumeUploader";
 import ResumeLoader from "./components/ResumeLoader";
 import PaymentSuccess from "./components/PaymentSuccess";
+import ResumeBuilderForFreshers from "./components/ResumeBuilderForFreshers";
 const App = () => {
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("formData");
@@ -45,6 +46,7 @@ const App = () => {
     <ConditionalLayout>
       <Routes>
         <Route path="/" element={<HomePage dynamicNavigation={navigateTo} />} />
+        <Route path="/blog/resume-builder-for-freshers" element={<ResumeBuilderForFreshers />} />
         {!user && <Route path="/login" element={<LoginPage dynamicNavigation={navigateTo} />} />}
 
         {/* Protected Routes */}
