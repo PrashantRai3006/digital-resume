@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Digital Resume Builder Blog</title>
+    <link>https://digitalresumebuilder.com/blog</link>
+    <description>Latest updates and tips from Digital Resume Builder</description>
+    <language>en</language>
+    <copyright>Copyright 2024 Digital Resume Builder</copyright>
+    <atom:link href="https://digitalresumebuilder.com/rss.xml" rel="self" type="application/rss+xml" />
+    <!-- Example item -->
+    <item>
+      <title>Resume Builder for Freshers</title>
+      <link>https://digitalresumebuilder.com/blog/resume-builder-for-freshers</link>
+      <description>How to create a resume as a fresher using Digital Resume Builder.</description>
+      <pubDate>Mon, 01 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>https://digitalresumebuilder.com/blog/resume-builder-for-freshers</guid>
+    </item>
+    <!-- Add more items as needed -->
+  </channel>
+</rss>

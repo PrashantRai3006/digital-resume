@@ -16,6 +16,8 @@ import ResumeUploader from "./components/ResumeUploader";
 import ResumeLoader from "./components/ResumeLoader";
 import PaymentSuccess from "./components/PaymentSuccess";
 import ResumeBuilderForFreshers from "./components/ResumeBuilderForFreshers";
+import BlogPage from "./components/BlogPage"; // Add this import if BlogPage exists or create a placeholder
+
 const App = () => {
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("formData");
@@ -46,18 +48,24 @@ const App = () => {
     <ConditionalLayout>
       <Routes>
         <Route path="/" element={<HomePage dynamicNavigation={navigateTo} />} />
+        <Route path="/blog" element={<BlogPage />} /> {/* Add this line */}
         <Route path="/blog/resume-builder-for-freshers" element={<ResumeBuilderForFreshers />} />
         {!user && <Route path="/login" element={<LoginPage dynamicNavigation={navigateTo} />} />}
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
-        <Route path="/file-upload" element={<ResumeUploader setFormData={setFormData} dynamicNavigation={navigateTo}/>} />
+          <Route path="/file-upload" element={<ResumeUploader setFormData={setFormData} dynamicNavigation={navigateTo}/>} />
           <Route path="/form" element={<ResumeForm setFormData={setFormData} formData={formData} dynamicNavigation={navigateTo} />} />
+          {/* Optionally add static routes for each digital-resume */}
+          {/* 
+          <Route path="/digital-resume/1" element={<TemplateRender formData={formData} dynamicNavigation={navigateTo} />} />
+          <Route path="/digital-resume/2" element={<TemplateRender formData={formData} dynamicNavigation={navigateTo} />} />
+          ...repeat for 3-10...
+          */}
           <Route path="/digital-resume/:id" element={<TemplateRender formData={formData} dynamicNavigation={navigateTo} />} />
           <Route path="/thank-you" element={<ThankYouPage dynamicNavigation={navigateTo} formData={formData} />} />
           <Route path="/resume-preview" element={<ResumePreview />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
-
         </Route>
       </Routes>
     </ConditionalLayout>

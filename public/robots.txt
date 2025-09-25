@@ -1,3 +1,12 @@
+# Robots.txt for https://digitalresumebuilder.com
+
 User-agent: *
 Allow: /
+Crawl-delay: 5
+Disallow: /api/
+Disallow: /admin/
 Sitemap: https://digitalresumebuilder.com/sitemap.xml
+
+# Uncomment below if you want to specify rules for Googlebot
+# User-agent: Googlebot
+# Allow: /
